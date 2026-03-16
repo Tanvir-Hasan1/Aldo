@@ -1,0 +1,121 @@
+import {
+  Analytics01Icon,
+  CheckListIcon,
+  Comment01Icon,
+  DocumentAttachmentIcon,
+  Home07Icon,
+  Settings01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react-native";
+import { Tabs } from "expo-router";
+import { moderateScale, scale, verticalScale } from "react-native-size-matters";
+
+export default function TabLayout() {
+  return (
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#FA8C4C", // Active color from mockup
+        tabBarInactiveTintColor: "#6B7280",
+        tabBarStyle: {
+          position: "absolute", // Needed for border radii to sit above content seamlessly
+          backgroundColor: "#FFF0E5", // Faint orange background from the mockup
+          borderTopLeftRadius: scale(20),
+          borderTopRightRadius: scale(20),
+          height: verticalScale(60),
+          paddingBottom: verticalScale(8),
+          paddingTop: verticalScale(8),
+          borderTopWidth: 0,
+          elevation: 10,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+        },
+        tabBarLabelStyle: {
+          fontSize: moderateScale(10, 0.3),
+          fontWeight: "500",
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          tabBarLabel: "Home",
+          tabBarIcon: ({ color }) => (
+            <HugeiconsIcon
+              icon={Home07Icon}
+              size={moderateScale(24)}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="analytics"
+        options={{
+          tabBarLabel: "Analytics",
+          tabBarIcon: ({ color }) => (
+            <HugeiconsIcon
+              icon={Analytics01Icon}
+              size={moderateScale(24)}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="inventory"
+        options={{
+          tabBarLabel: "Inventory",
+          tabBarIcon: ({ color }) => (
+            <HugeiconsIcon
+              icon={CheckListIcon}
+              size={moderateScale(24)}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="documents"
+        options={{
+          tabBarLabel: "Documents",
+          tabBarIcon: ({ color }) => (
+            <HugeiconsIcon
+              icon={DocumentAttachmentIcon}
+              size={moderateScale(24)}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          tabBarLabel: "Chat",
+          tabBarIcon: ({ color }) => (
+            <HugeiconsIcon
+              icon={Comment01Icon}
+              size={moderateScale(24)}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          tabBarLabel: "Settings",
+          tabBarIcon: ({ color }) => (
+            <HugeiconsIcon
+              icon={Settings01Icon}
+              size={moderateScale(24)}
+              color={color}
+            />
+          ),
+        }}
+      />
+    </Tabs>
+  );
+}
