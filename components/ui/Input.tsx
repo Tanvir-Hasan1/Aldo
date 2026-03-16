@@ -9,6 +9,7 @@ interface InputProps extends TextInputProps {
   isPasswordVisible?: boolean;
   onTogglePasswordVisibility?: () => void;
   leadingIcon?: React.ReactNode;
+  trailingIcon?: React.ReactNode;
 }
 
 export default function Input({
@@ -17,6 +18,7 @@ export default function Input({
   isPasswordVisible,
   onTogglePasswordVisibility,
   leadingIcon,
+  trailingIcon,
   style,
   ...props
 }: InputProps) {
@@ -52,6 +54,11 @@ export default function Input({
               color="#9CA3AF"
             />
           </TouchableOpacity>
+        )}
+        {trailingIcon && !isPassword && (
+          <View style={styles.trailingIconContainer}>
+            {trailingIcon}
+          </View>
         )}
       </View>
     </View>
@@ -89,6 +96,11 @@ const styles = StyleSheet.create({
   leadingIconContainer: {
     position: 'absolute',
     left: scale(16),
+    zIndex: 1,
+  },
+  trailingIconContainer: {
+    position: 'absolute',
+    right: scale(16),
     zIndex: 1,
   },
 });

@@ -7,20 +7,27 @@ import {
   Settings01Icon,
 } from "@hugeicons/core-free-icons";
 import * as HugeiconsModule from "@hugeicons/react-native";
-import { Tabs } from "expo-router";
+import { Tabs, useSegments } from "expo-router";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 
 const HugeiconsIcon = HugeiconsModule.HugeiconsIcon || HugeiconsModule.default?.HugeiconsIcon || (HugeiconsModule as any);
 
 export default function TabLayout() {
-  console.log("HugeiconsIcon Extracted:", !!HugeiconsIcon);
+  const segments = useSegments();
+  
+  // Conditionally hide tab bar on specific screens that are deep in stacks
+  // Only show tab bar if we are on the exact root of a tab (e.g. ['(tabs)', 'home'] or ['(tabs)', 'home', 'index'])
+  const isRootScreen = segments.length <= 2 || (segments.length === 3 && (segments as any[])[2] === 'index');
+  const shouldHideTabBar = !isRootScreen;
+
+  console.log("Current segments:", segments, "Should Hide:", shouldHideTabBar);
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: "#FA8C4C", // Active color from mockup
         tabBarInactiveTintColor: "#6B7280",
-        tabBarStyle: {
+        tabBarStyle: shouldHideTabBar ? { display: 'none', height: 0, opacity: 0 } : {
           position: "absolute", // Needed for border radii to sit above content seamlessly
           backgroundColor: "#FFF0E5", // Faint orange background from the mockup
           borderTopLeftRadius: scale(20),
@@ -42,7 +49,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           tabBarLabel: "Home",
           tabBarIcon: ({ color }) => (

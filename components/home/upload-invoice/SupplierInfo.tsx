@@ -1,0 +1,59 @@
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+
+export default function SupplierInfo() {
+  return (
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>SUPPLIER NAME</Text>
+      <Text style={styles.infoValueMain}>Fresh Food Supplier Ltd</Text>
+      
+      <View style={styles.infoRow}>
+        <View style={styles.infoCol}>
+          <Text style={styles.infoLabel}>INVOICE NUMBER</Text>
+          <Text style={styles.infoValue}>INV-2045</Text>
+        </View>
+        <View style={styles.infoCol}>
+          <Text style={styles.infoLabel}>INVOICE DATE</Text>
+          <Text style={styles.infoValue}>10 March 2026</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  infoCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: scale(16),
+    padding: scale(20),
+    marginBottom: verticalScale(24),
+  },
+  infoLabel: {
+    fontSize: moderateScale(10, 0.3),
+    fontWeight: '600',
+    color: '#6B7280',
+    letterSpacing: 0.5,
+    marginBottom: verticalScale(4),
+  },
+  infoValueMain: {
+    fontSize: moderateScale(16, 0.3),
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: verticalScale(16),
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  infoCol: {
+    flex: 1,
+  },
+  infoValue: {
+    fontSize: moderateScale(14, 0.3),
+    fontWeight: '600',
+    color: '#111827',
+  },
+});

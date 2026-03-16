@@ -1,33 +1,46 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
-import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
-export default function VatBalance() {
+export default function VatBalance({ onPress }: { onPress?: () => void }) {
+  const Container = onPress ? TouchableOpacity : React.Fragment;
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.subtitle}>ESTIMATED VAT BALANCE</Text>
-      <Text style={styles.balanceText}>€80</Text>
-      
-      <View style={styles.syncContainer}>
-        <View style={styles.syncDot} />
-        <Text style={styles.syncText}>Live sync</Text>
-      </View>
-    </View>
+    <Container {...(onPress ? { onPress, activeOpacity: 0.8 } : {})}>
+      <LinearGradient
+        colors={['#1F1612', '#C28522']}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        style={styles.container}
+      >
+        <Text style={styles.subtitle}>ESTIMATED VAT BALANCE</Text>
+        <Text style={styles.balanceText}>€80</Text>
+        
+        <View style={styles.syncContainer}>
+          <View style={styles.syncDot} />
+          <Text style={styles.syncText}>Live sync</Text>
+        </View>
+      </LinearGradient>
+    </Container>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#352109', // Dark brown to mimic gradient from mockup
     borderRadius: scale(16),
     padding: scale(20),
     marginBottom: verticalScale(24),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   subtitle: {
     fontSize: moderateScale(11, 0.3),
     fontWeight: '600',
-    color: '#D1D5DB', // Light gray
+    color: '#D1D5DB',
     letterSpacing: 0.5,
     marginBottom: verticalScale(8),
   },
@@ -50,7 +63,7 @@ const styles = StyleSheet.create({
     width: scale(6),
     height: scale(6),
     borderRadius: scale(3),
-    backgroundColor: '#10B981', // green dot
+    backgroundColor: '#10B981',
     marginRight: scale(6),
   },
   syncText: {

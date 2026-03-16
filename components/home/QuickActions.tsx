@@ -1,16 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { useRouter } from 'expo-router';
 import { DocumentArrowUpIcon, PencilSquareIcon, ClipboardDocumentListIcon, CurrencyDollarIcon } from 'react-native-heroicons/outline';
 
 interface ActionItemProps {
   title: string;
   IconComponent: any;
+  onPress?: () => void;
 }
 
-const ActionItem = ({ title, IconComponent }: ActionItemProps) => {
+const ActionItem = ({ title, IconComponent, onPress }: ActionItemProps) => {
   return (
-    <TouchableOpacity style={styles.itemContainer}>
+    <TouchableOpacity style={styles.itemContainer} onPress={onPress}>
       <View style={styles.iconContainer}>
         <IconComponent size={moderateScale(20)} color="#FA8C4C" />
       </View>
@@ -20,9 +22,19 @@ const ActionItem = ({ title, IconComponent }: ActionItemProps) => {
 };
 
 export default function QuickActions() {
+  const router = useRouter();
+  
   const actions: ActionItemProps[] = [
-    { title: 'Upload Invoice', IconComponent: DocumentArrowUpIcon },
-    { title: 'Add Daily Data', IconComponent: PencilSquareIcon },
+    { 
+      title: 'Upload Invoice', 
+      IconComponent: DocumentArrowUpIcon,
+      onPress: () => router.push('/(tabs)/home/upload-invoice'),
+    },
+    { 
+      title: 'Add Daily Data', 
+      IconComponent: PencilSquareIcon,
+      onPress: () => router.push('/(tabs)/home/data-management'),
+    },
     { title: 'Expenses', IconComponent: ClipboardDocumentListIcon },
     { title: 'Cash', IconComponent: CurrencyDollarIcon },
   ];

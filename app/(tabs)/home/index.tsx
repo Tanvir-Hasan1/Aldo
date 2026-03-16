@@ -2,20 +2,22 @@ import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scale, verticalScale } from "react-native-size-matters";
+import { useRouter } from "expo-router";
 
 // Home Components
-import ActionFilterBar from "../../components/home/ActionFilterBar";
-import AIInsightBox from "../../components/home/AIInsightBox";
-import CashManagement from "../../components/home/CashManagement";
-import HomeHeader from "../../components/home/HomeHeader";
-import KPIGrid from "../../components/home/KPIGrid";
-import QuickActions from "../../components/home/QuickActions";
-import RecentActivity from "../../components/home/RecentActivity";
-import RevenueChart from "../../components/home/RevenueChart";
-import VatBalance from "../../components/home/VatBalance";
+import ActionFilterBar from "../../../components/home/ActionFilterBar";
+import AIInsightBox from "../../../components/home/AIInsightBox";
+import CashManagement from "../../../components/home/CashManagement";
+import HomeHeader from "../../../components/home/HomeHeader";
+import KPIGrid from "../../../components/home/KPIGrid";
+import QuickActions from "../../../components/home/QuickActions";
+import RecentActivity from "../../../components/home/RecentActivity";
+import RevenueChart from "../../../components/home/RevenueChart";
+import VatBalance from "../../../components/home/VatBalance";
 
 export default function TabsIndex() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -46,7 +48,7 @@ export default function TabsIndex() {
         <KPIGrid />
         <CashManagement />
         <QuickActions />
-        <VatBalance />
+        <VatBalance onPress={() => router.push("/(tabs)/home/vat")} />
         <RevenueChart />
         <AIInsightBox />
         <RecentActivity />

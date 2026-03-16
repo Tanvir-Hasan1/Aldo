@@ -29,7 +29,7 @@ export default function AuthLoginScreen() {
 
   const handleLogin = () => {
     // Navigate to the tabs flow
-    router.replace("/(tabs)");
+    router.replace("/(tabs)/home");
   };
 
   return (
