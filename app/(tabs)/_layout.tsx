@@ -6,11 +6,14 @@ import {
   Home07Icon,
   Settings01Icon,
 } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react-native";
+import * as HugeiconsModule from "@hugeicons/react-native";
 import { Tabs } from "expo-router";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 
+const HugeiconsIcon = HugeiconsModule.HugeiconsIcon || HugeiconsModule.default?.HugeiconsIcon || (HugeiconsModule as any);
+
 export default function TabLayout() {
+  console.log("HugeiconsIcon Extracted:", !!HugeiconsIcon);
   return (
     <Tabs
       screenOptions={{

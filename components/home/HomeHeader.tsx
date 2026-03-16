@@ -10,7 +10,6 @@ export default function HomeHeader() {
 
   return (
     <View style={styles.container}>
-      {/* Left items: Avatar & Text */}
       <View style={styles.leftSection}>
         <Image
           style={styles.avatar}
@@ -31,11 +30,9 @@ export default function HomeHeader() {
         </View>
       </View>
 
-      {/* Right items: Notification & Language */}
       <View style={styles.rightSection}>
         <TouchableOpacity style={styles.iconButton}>
           <BellIcon size={moderateScale(20)} color="#111827" />
-          {/* Notification dot badge */}
           <View style={styles.badge} />
         </TouchableOpacity>
 
@@ -48,7 +45,6 @@ export default function HomeHeader() {
         </TouchableOpacity>
       </View>
 
-      {/* Language Modal Overlay */}
       <LanguageModal
         visible={isLangMenuOpen}
         onClose={() => setIsLangMenuOpen(false)}

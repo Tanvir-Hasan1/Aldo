@@ -8,8 +8,7 @@ export default function ActionFilterBar() {
 
   return (
     <View style={styles.container}>
-       <View style={styles.spacer} /> {/* Pusher to align items right */}
-      
+      <View style={styles.spacer} />
       <View style={styles.actionsGroup}>
         <TouchableOpacity 
           style={styles.actionButton}
