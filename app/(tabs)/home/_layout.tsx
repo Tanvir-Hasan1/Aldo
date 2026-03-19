@@ -52,6 +52,38 @@ export default function HomeLayout() {
           animation: 'slide_from_right'
         }} 
       />
+      <Stack.Screen 
+        name="expenses" 
+        options={{ 
+          headerShown: false,
+          presentation: 'card', 
+          animation: 'slide_from_right'
+        }} 
+      />
+      <Stack.Screen 
+        name="add-expense" 
+        options={{ 
+          headerShown: false,
+          presentation: 'card', 
+          animation: 'slide_from_right'
+        }} 
+      />
+      <Stack.Screen 
+        name="cash-management" 
+        options={{ 
+          headerShown: false,
+          presentation: 'card', 
+          animation: 'slide_from_right'
+        }} 
+      />
+      <Stack.Screen 
+        name="add-bank-deposit" 
+        options={{ 
+          headerShown: false,
+          presentation: 'card', 
+          animation: 'slide_from_right'
+        }} 
+      />
     </Stack>
   );
 }

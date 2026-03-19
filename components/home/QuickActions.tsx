@@ -35,8 +35,16 @@ export default function QuickActions() {
       IconComponent: PencilSquareIcon,
       onPress: () => router.push('/(tabs)/home/data-management'),
     },
-    { title: 'Expenses', IconComponent: ClipboardDocumentListIcon },
-    { title: 'Cash', IconComponent: CurrencyDollarIcon },
+    { 
+      title: 'Expenses', 
+      IconComponent: ClipboardDocumentListIcon,
+      onPress: () => router.push('/(tabs)/home/expenses'),
+    },
+    { 
+      title: 'Cash', 
+      IconComponent: CurrencyDollarIcon,
+      onPress: () => router.push('/(tabs)/home/cash-management'),
+    },
   ];
 
   return (
