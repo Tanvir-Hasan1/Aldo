@@ -1,0 +1,83 @@
+import { Feather } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+
+export function InventoryCard({ item }: { item: any }) {
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        <View style={styles.iconBox}>
+          <Text style={styles.iconEmoji}>{item.icon}</Text>
+        </View>
+        <View style={styles.cardMeta}>
+          <Text style={styles.cardName}>{item.name}</Text>
+          <Text style={styles.cardSupplier}>{item.supplier}</Text>
+        </View>
+        <Text style={[styles.statusBadge, { color: item.statusColor }]}>{item.status}</Text>
+      </View>
+
+      <View style={styles.cardFooter}>
+        <View>
+          <Text style={styles.footerLabel}>STOCK QUANTITY</Text>
+          <Text style={styles.footerValue}>
+            {item.quantity} {item.unit}
+          </Text>
+        </View>
+        <View>
+          <Text style={styles.footerLabel}>LAST PURCHASE</Text>
+          <Text style={styles.footerValue}>{item.lastPurchase}</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.eyeButton}
+          onPress={() => router.push(`/(tabs)/inventory/${item.id}`)}
+        >
+          <Feather name="eye" size={moderateScale(18)} color="#6B7280" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: scale(12),
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+    padding: scale(14),
+    marginBottom: verticalScale(10),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(10) },
+  iconBox: {
+    width: moderateScale(40),
+    height: moderateScale(40),
+    borderRadius: scale(10),
+    backgroundColor: '#FFF4EE',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: scale(10),
+  },
+  iconEmoji: { fontSize: moderateScale(20) },
+  cardMeta: { flex: 1 },
+  cardName: { fontSize: moderateScale(14), fontWeight: '700', color: '#111827' },
+  cardSupplier: { fontSize: moderateScale(11), color: '#9CA3AF', marginTop: 2 },
+  statusBadge: { fontSize: moderateScale(10), fontWeight: '700' },
+  cardFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  footerLabel: { fontSize: moderateScale(9), color: '#9CA3AF', fontWeight: '600', letterSpacing: 0.4 },
+  footerValue: { fontSize: moderateScale(13), fontWeight: '600', color: '#111827', marginTop: 2 },
+  eyeButton: {
+    width: moderateScale(34),
+    height: moderateScale(34),
+    borderRadius: moderateScale(17),
+    backgroundColor: '#F9FAFB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
