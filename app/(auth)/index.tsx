@@ -1,6 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import axios from "axios";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -11,10 +12,13 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import Input from "../../components/ui/Input";
+import { useAppStore } from "../../store/useAppStore";
 
 // @ts-ignore
 import SplashLogo from "../../assets/images/splash-logo.svg";
@@ -22,14 +26,48 @@ import SplashLogo from "../../assets/images/splash-logo.svg";
 export default function AuthLoginScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const setUser = useAppStore((state) => state.setUser);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    // Navigate to the tabs flow
-    router.replace("/(tabs)/home");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || "https://risto-ai.vercel.app";
+      const response = await axios.post(
+        `${apiUrl}/api/v1/auth/restaurant/login`,
+        { email, password }
+      );
+
+      const data = response.data;
+
+      console.log("Login API Response:", JSON.stringify(data, null, 2));
+
+      // Save user and tokens to store
+      setUser(data.user, data.tokens);
+
+      // Navigate to the tabs flow
+      router.replace("/(tabs)/home" as any);
+    } catch (error: any) {
+      console.log("Login API Error:", error.response?.data || error.message);
+      
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.detail ||
+        error.message ||
+        "An unexpected error occurred";
+      Alert.alert("Login Failed", errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -88,12 +126,19 @@ export default function AuthLoginScreen() {
               onChangeText={setPassword}
             />
 
-            <TouchableOpacity style={styles.forgotPasswordButton}>
+            <TouchableOpacity 
+              style={styles.forgotPasswordButton}
+              onPress={() => router.push("/(auth)/forgot-password" as any)}
+            >
               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-              <Text style={styles.loginButtonText}>Login</Text>
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={isLoading}>
+              {isLoading ? (
+                <ActivityIndicator color={"#FFFFFF"} />
+              ) : (
+                <Text style={styles.loginButtonText}>Login</Text>
+              )}
             </TouchableOpacity>
           </View>
 

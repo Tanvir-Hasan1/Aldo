@@ -7,12 +7,14 @@ interface OTPVerificationProps {
   code: string[];
   setCode: (code: string[]) => void;
   initialTimeLeft?: number;
+  onResend?: () => void;
 }
 
 export default function OTPVerification({
   code,
   setCode,
   initialTimeLeft = 45,
+  onResend,
 }: OTPVerificationProps) {
   const inputRefs = useRef<Array<TextInput | null>>([null, null, null, null]);
   const [timeLeft, setTimeLeft] = useState(initialTimeLeft);
@@ -85,7 +87,10 @@ export default function OTPVerification({
             </Text>
           </>
         ) : (
-          <TouchableOpacity onPress={() => setTimeLeft(initialTimeLeft)}>
+          <TouchableOpacity onPress={() => {
+            if (onResend) onResend();
+            setTimeLeft(initialTimeLeft);
+          }}>
             <Text
               style={[
                 styles.resendText,

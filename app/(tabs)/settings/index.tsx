@@ -8,9 +8,11 @@ import LanguageSelector from '../../../components/settings/LanguageSelector';
 import ProfileCard from '../../../components/settings/ProfileCard';
 import SettingsList from '../../../components/settings/SettingsList';
 import Header from '../../../components/ui/Header';
+import { useAppStore } from '../../../store/useAppStore';
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const logout = useAppStore((state) => state.logout);
 
   return (
     <View style={styles.safeArea}>
@@ -46,7 +48,13 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity 
+          style={styles.logoutButton}
+          onPress={() => {
+            logout();
+            router.replace('/(auth)' as any);
+          }}
+        >
           <Feather name="log-out" size={moderateScale(18)} color="#EF4444" />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>

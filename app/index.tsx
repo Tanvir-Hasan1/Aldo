@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, Redirect } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
   FlatList,
@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
+import { useEffect } from "react";
+import { useAppStore } from "../store/useAppStore";
 
 // @ts-ignore
 import BackgroundSVG from "../assets/images/onboarding/Background+Border+Shadow.svg";
@@ -55,6 +57,12 @@ export default function OnboardingScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const slidesRef = useRef<FlatList>(null);
   const router = useRouter();
+  
+  const user = useAppStore((state) => state.user);
+
+  if (user) {
+    return <Redirect href="/(tabs)/home" />;
+  }
 
   const viewableItemsChanged = useRef(({ viewableItems }: any) => {
     if (viewableItems && viewableItems.length > 0) {

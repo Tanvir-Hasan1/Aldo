@@ -1,6 +1,7 @@
 import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import axios from "axios";
 import {
   ImageBackground,
   Keyboard,
@@ -12,6 +13,8 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
@@ -33,10 +36,74 @@ export default function AuthSignupScreen() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignup = () => {
-    // Navigate to the verify identity screen
-    router.push("/(auth)/verify");
+  const handleSignup = async () => {
+    if (!restaurantName || !ownerName || !email || !password) {
+      Alert.alert("Error", "Please fill in all fields.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || "https://risto-ai.vercel.app";
+      const response = await axios.post(
+        `${apiUrl}/api/v1/auth/restaurant/register`,
+        {
+          restaurant_name: restaurantName,
+          owner_full_name: ownerName,
+          email: email.trim(),
+          password: password,
+        }
+      );
+
+      const data = response.data;
+      console.log("Signup API Response:", data);
+
+      Alert.alert("Success", data.message || "Account created successfully.");
+      
+      // Navigate to the verify identity screen, passing all data needed for resend
+      router.push({
+        pathname: "/(auth)/verify",
+        params: { 
+          email: email.trim(),
+          restaurant_name: restaurantName,
+          owner_full_name: ownerName,
+          password: password,
+        }
+      } as any);
+      
+    } catch (error: any) {
+      console.log("Signup API Error:", error.response?.data || error.message);
+      
+      let errorMessage = "An unexpected error occurred during signup.";
+      const errData = error.response?.data;
+      
+      if (errData?.error?.code === "conflict" || errData?.error?.message === "An account with this email already exists" || errData?.message === "An account with this email already exists") {
+        errorMessage = "Account exist";
+      } else if (errData) {
+        if (typeof errData === 'string') {
+          try {
+            const parsed = JSON.parse(errData);
+            errorMessage = parsed.error?.message || parsed.message || parsed.detail || errData;
+          } catch {
+            errorMessage = errData;
+          }
+        } else {
+          errorMessage = errData.error?.message || errData.message || errData.detail || JSON.stringify(errData);
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -156,8 +223,13 @@ export default function AuthSignupScreen() {
             <TouchableOpacity
               style={styles.createButton}
               onPress={handleSignup}
+              disabled={isLoading}
             >
-              <Text style={styles.createButtonText}>Create Account</Text>
+              {isLoading ? (
+                <ActivityIndicator color={"#FFFFFF"} />
+              ) : (
+                <Text style={styles.createButtonText}>Create Account</Text>
+              )}
             </TouchableOpacity>
           </View>
 

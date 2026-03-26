@@ -1,5 +1,6 @@
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
+import axios from "axios";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -9,6 +10,8 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
@@ -17,14 +20,103 @@ import OTPVerification from "../../components/ui/OTPVerification";
 
 // @ts-ignore
 import SecurityIcon from "../../assets/images/Security Icon.svg";
+import { useAppStore } from "../../store/useAppStore";
 
 export default function VerifyIdentityScreen() {
   const router = useRouter();
+  const { email, restaurant_name, owner_full_name, password } = useLocalSearchParams<{ 
+    email: string;
+    restaurant_name: string;
+    owner_full_name: string;
+    password: string;
+  }>();
+  const setUser = useAppStore((state) => state.setUser);
+  
   const [code, setCode] = useState(["", "", "", ""]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
-  const handleConfirm = () => {
-    // Navigate to the subscription flow
-    router.push("/(auth)/subscription");
+  const handleResendCode = async () => {
+    if (!email || !restaurant_name || !owner_full_name || !password) {
+      Alert.alert("Error", "Missing registration details. Please restart the signup process.");
+      return;
+    }
+    
+    setIsResending(true);
+    try {
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || "https://risto-ai.vercel.app";
+      const response = await axios.post(`${apiUrl}/api/v1/auth/restaurant/register`, {
+        restaurant_name,
+        owner_full_name,
+        email,
+        password
+      });
+      console.log("Resend API Response:", response.data);
+      Alert.alert("Success", response.data?.message || "Verification code resent to your email.");
+    } catch (error: any) {
+      console.log("Resend API Error:", error.response?.data || error.message);
+      const errData = error.response?.data;
+      let errorMessage = "An unexpected error occurred.";
+      if (errData) {
+        if (typeof errData === "string") {
+          try {
+            const parsed = JSON.parse(errData);
+            errorMessage = parsed.error?.message || parsed.message || parsed.detail || errData;
+          } catch {
+            errorMessage = errData;
+          }
+        } else {
+          errorMessage = errData.error?.message || errData.message || errData.detail || JSON.stringify(errData);
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const handleConfirm = async () => {
+    const otp = code.join("");
+    if (otp.length !== 4) {
+      Alert.alert("Error", "Please enter the 4-digit code.");
+      return;
+    }
+
+    if (!email) {
+      Alert.alert("Error", "Email not found. Please try signing up again.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || "https://risto-ai.vercel.app";
+      const response = await axios.post(
+        `${apiUrl}/api/v1/auth/restaurant/verify-registration`,
+        {
+          email,
+          code: otp,
+        }
+      );
+
+      const data = response.data;
+      setUser(data.user, data.tokens);
+
+      Alert.alert("Success", "Email verified successfully!");
+      router.replace("/(auth)/subscription" as any);
+      
+    } catch (error: any) {
+      console.log("Verify API Error:", error.response?.data || error.message);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.detail ||
+        error.message ||
+        "An unexpected error occurred during verification.";
+      Alert.alert("Verification Failed", errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,7 +139,7 @@ export default function VerifyIdentityScreen() {
               </Text>
 
               {/* OTP Component */}
-              <OTPVerification code={code} setCode={setCode} />
+              <OTPVerification code={code} setCode={setCode} onResend={handleResendCode} />
             </View>
 
             {/* Bottom Section */}
@@ -55,14 +147,13 @@ export default function VerifyIdentityScreen() {
               <TouchableOpacity
                 style={styles.confirmButton}
                 onPress={handleConfirm}
+                disabled={isLoading}
               >
-                <Text style={styles.confirmButtonText}>Confirm</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.didNotReceiveButton}>
-                <Text style={styles.didNotReceiveText}>
-                  I didn't receive a code
-                </Text>
+                {isLoading ? (
+                  <ActivityIndicator color={"#FFFFFF"} />
+                ) : (
+                  <Text style={styles.confirmButtonText}>Confirm</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
