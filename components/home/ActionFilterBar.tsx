@@ -3,8 +3,21 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { ArrowDownTrayIcon, ChevronDownIcon } from 'react-native-heroicons/outline';
 
-export default function ActionFilterBar() {
+interface ActionFilterBarProps {
+  activePeriod: string;
+  availablePeriods: string[];
+  onPeriodChange: (period: string) => void;
+}
+
+export default function ActionFilterBar({ 
+  activePeriod, 
+  availablePeriods, 
+  onPeriodChange 
+}: ActionFilterBarProps) {
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+  const [isPeriodMenuOpen, setIsPeriodMenuOpen] = useState(false);
+
+  const formatPeriod = (p: string) => p.charAt(0).toUpperCase() + p.slice(1);
 
   return (
     <View style={styles.container}>
@@ -18,8 +31,11 @@ export default function ActionFilterBar() {
           <Text style={styles.actionText}>Export Data</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Weekly</Text>
+        <TouchableOpacity 
+          style={styles.filterButton}
+          onPress={() => setIsPeriodMenuOpen(true)}
+        >
+          <Text style={styles.filterText}>{formatPeriod(activePeriod)}</Text>
           <ChevronDownIcon size={moderateScale(14)} color="#111827" />
         </TouchableOpacity>
       </View>
@@ -36,7 +52,7 @@ export default function ActionFilterBar() {
           activeOpacity={1} 
           onPress={() => setIsExportMenuOpen(false)}
         >
-          <View style={styles.dropdownMenu}>
+          <View style={[styles.dropdownMenu, { right: scale(100) }]}>
             <TouchableOpacity 
               style={styles.exportOptionBtn}
               onPress={() => setIsExportMenuOpen(false)}
@@ -50,6 +66,43 @@ export default function ActionFilterBar() {
             >
               <Text style={styles.exportOptionText}>Excel</Text>
             </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Period Selection Modal */}
+      <Modal
+        visible={isPeriodMenuOpen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsPeriodMenuOpen(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setIsPeriodMenuOpen(false)}
+        >
+          <View style={[styles.dropdownMenu, { right: scale(20) }]}>
+            {availablePeriods.map((period) => (
+              <TouchableOpacity 
+                key={period}
+                style={[
+                  styles.exportOptionBtn, 
+                  activePeriod === period && { borderColor: '#FA8C4C', backgroundColor: '#FFF0E5' }
+                ]}
+                onPress={() => {
+                  onPeriodChange(period);
+                  setIsPeriodMenuOpen(false);
+                }}
+              >
+                <Text style={[
+                  styles.exportOptionText,
+                  activePeriod === period && { color: '#FA8C4C' }
+                ]}>
+                  {formatPeriod(period)}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </TouchableOpacity>
       </Modal>

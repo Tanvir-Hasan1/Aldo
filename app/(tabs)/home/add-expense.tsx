@@ -1,5 +1,4 @@
 import { Feather } from "@expo/vector-icons";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -11,14 +10,76 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Modal,
+  FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import Header from "../../../components/ui/Header";
 import DatePicker from "../../../components/ui/DatePicker";
+import apiClient from "../../../api/apiClient";
 
 export default function AddExpenseScreen() {
   const router = useRouter();
-  const [date, setDate] = useState(new Date("2026-03-12T00:00:00"));
+  const [date, setDate] = useState(new Date());
+  const [amount, setAmount] = useState("");
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  // Category State
+  const [categories, setCategories] = useState(["Food", "Utilities", "Rent", "Supplies", "Marketing", "Others"]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [isCategoryListVisible, setIsCategoryListVisible] = useState(false);
+  
+  // New Category State
+  const [isNewCategoryModalVisible, setIsNewCategoryModalVisible] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+
+  const handleCreateCategory = () => {
+    if (newCategoryName.trim()) {
+      const trimmedName = newCategoryName.trim();
+      if (!categories.includes(trimmedName)) {
+        setCategories([...categories, trimmedName]);
+      }
+      setSelectedCategory(trimmedName);
+      setNewCategoryName("");
+      setIsNewCategoryModalVisible(false);
+    }
+  };
+
+  const handleDeleteCategory = (categoryToDelete: string) => {
+    setCategories(categories.filter(cat => cat !== categoryToDelete));
+    if (selectedCategory === categoryToDelete) {
+      setSelectedCategory("");
+    }
+  };
+
+  const handleSave = async () => {
+    if (!selectedCategory || !amount) return;
+
+    try {
+      setLoading(true);
+      // Format date to YYYY-MM-DD
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+
+      await apiClient.post("/api/v1/restaurant/expenses", {
+        category: selectedCategory,
+        amount: parseFloat(amount) || 0,
+        expense_date: formattedDate,
+        notes: notes
+      });
+
+      // Navigate back on success (as requested: no alert)
+      router.back();
+    } catch (error) {
+      console.error("Error saving expense:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.safeArea}>
@@ -35,12 +96,20 @@ export default function AddExpenseScreen() {
           {/* Category Dropdown */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Expense Category</Text>
-            <TouchableOpacity style={styles.dropdownInput}>
-              <Text style={styles.dropdownPlaceholder}>Select a category</Text>
+            <TouchableOpacity 
+              style={styles.dropdownInput}
+              onPress={() => setIsCategoryListVisible(true)}
+            >
+              <Text style={selectedCategory ? styles.dropdownText : styles.dropdownPlaceholder}>
+                {selectedCategory || "Select a category"}
+              </Text>
               <Feather name="chevron-down" size={moderateScale(20)} color="#6B7280" />
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.newCategoryPill}>
+            <TouchableOpacity 
+              style={styles.newCategoryPill}
+              onPress={() => setIsNewCategoryModalVisible(true)}
+            >
               <Feather name="plus" size={moderateScale(12)} color="#FA8C4C" style={{ marginRight: scale(4) }} />
               <Text style={styles.newCategoryText}>Create New Category</Text>
             </TouchableOpacity>
@@ -56,6 +125,8 @@ export default function AddExpenseScreen() {
                 placeholder="0.00" 
                 placeholderTextColor="#9CA3AF"
                 keyboardType="numeric"
+                value={amount}
+                onChangeText={setAmount}
               />
             </View>
           </View>
@@ -76,17 +147,112 @@ export default function AddExpenseScreen() {
               placeholderTextColor="#9CA3AF"
               multiline
               textAlignVertical="top"
+              value={notes}
+              onChangeText={setNotes}
             />
           </View>
         </ScrollView>
 
         <View style={styles.bottomFooter}>
-          <TouchableOpacity style={styles.saveButton}>
-            <Feather name="save" size={moderateScale(18)} color="#FFFFFF" style={styles.saveIcon} />
-            <Text style={styles.saveButtonText}>Save Expense</Text>
+          <TouchableOpacity 
+            style={[styles.saveButton, (loading || !selectedCategory || !amount) && styles.disabledButton]} 
+            onPress={handleSave}
+            disabled={loading || !selectedCategory || !amount}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <>
+                <Feather name="save" size={moderateScale(18)} color="#FFFFFF" style={styles.saveIcon} />
+                <Text style={styles.saveButtonText}>Save Expense</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+
+      {/* Category Selection Modal */}
+      <Modal
+        visible={isCategoryListVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsCategoryListVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.categoryListContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Category</Text>
+              <TouchableOpacity onPress={() => setIsCategoryListVisible(false)}>
+                <Feather name="x" size={moderateScale(24)} color="#111827" />
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={categories}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <View style={styles.categoryItemRow}>
+                  <TouchableOpacity 
+                    style={styles.categoryItemMain}
+                    onPress={() => {
+                      setSelectedCategory(item);
+                      setIsCategoryListVisible(false);
+                    }}
+                  >
+                    <Text style={[styles.categoryItemText, selectedCategory === item && styles.selectedCategoryItemText]}>
+                      {item}
+                    </Text>
+                    {selectedCategory === item && (
+                      <Feather name="check" size={moderateScale(18)} color="#FA8C4C" />
+                    )}
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={styles.deleteCategoryButton}
+                    onPress={() => handleDeleteCategory(item)}
+                  >
+                    <Feather name="trash-2" size={moderateScale(18)} color="#EF4444" />
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+          </View>
+        </View>
+      </Modal>
+
+      {/* New Category Modal */}
+      <Modal
+        visible={isNewCategoryModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsNewCategoryModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.newCategoryContainer}>
+            <Text style={styles.modalTitle}>Create New Category</Text>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Enter category name..."
+              value={newCategoryName}
+              onChangeText={setNewCategoryName}
+              autoFocus
+            />
+            <View style={styles.modalActions}>
+              <TouchableOpacity 
+                style={styles.cancelButton}
+                onPress={() => setIsNewCategoryModalVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.confirmButton}
+                onPress={handleCreateCategory}
+              >
+                <Text style={styles.confirmButtonText}>Create</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -95,26 +261,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: scale(20),
-    paddingBottom: verticalScale(16),
-  },
-  backButton: {
-    width: moderateScale(40),
-    height: moderateScale(40),
-    borderRadius: moderateScale(20),
-    backgroundColor: "#F9FAFB",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: moderateScale(16, 0.3),
-    fontWeight: "700",
-    color: "#111827",
   },
   scrollContent: {
     paddingHorizontal: scale(20),
@@ -144,7 +290,12 @@ const styles = StyleSheet.create({
   },
   dropdownPlaceholder: {
     fontSize: moderateScale(15, 0.3),
-    color: '#374151',
+    color: '#9CA3AF',
+  },
+  dropdownText: {
+    fontSize: moderateScale(15, 0.3),
+    color: '#111827',
+    fontWeight: '500',
   },
   newCategoryPill: {
     flexDirection: 'row',
@@ -213,6 +364,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  disabledButton: {
+    backgroundColor: "#FDBA74",
+  },
   saveIcon: {
     marginRight: scale(8),
   },
@@ -220,5 +374,96 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: moderateScale(16, 0.3),
     fontWeight: "700",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  categoryListContainer: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: scale(24),
+    borderTopRightRadius: scale(24),
+    maxHeight: '80%',
+    paddingBottom: verticalScale(30),
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: scale(20),
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  modalTitle: {
+    fontSize: moderateScale(18, 0.3),
+    fontWeight: '700',
+    color: '#111827',
+  },
+  categoryItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#F9FAFB',
+  },
+  categoryItemMain: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: verticalScale(16),
+    paddingLeft: scale(20),
+    paddingRight: scale(10),
+  },
+  deleteCategoryButton: {
+    padding: scale(16),
+  },
+  categoryItemText: {
+    fontSize: moderateScale(16, 0.3),
+    color: '#4B5563',
+  },
+  selectedCategoryItemText: {
+    color: '#FA8C4C',
+    fontWeight: '600',
+  },
+  newCategoryContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: scale(16),
+    margin: scale(20),
+    padding: scale(24),
+    marginBottom: '50%', // Offset for keyboard
+  },
+  modalInput: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#D1D5DB',
+    fontSize: moderateScale(16, 0.3),
+    color: '#111827',
+    paddingVertical: verticalScale(8),
+    marginVertical: verticalScale(20),
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  cancelButton: {
+    paddingHorizontal: scale(16),
+    paddingVertical: verticalScale(8),
+    marginRight: scale(8),
+  },
+  cancelButtonText: {
+    color: '#6B7280',
+    fontSize: moderateScale(15, 0.3),
+    fontWeight: '600',
+  },
+  confirmButton: {
+    backgroundColor: '#FA8C4C',
+    paddingHorizontal: scale(20),
+    paddingVertical: verticalScale(8),
+    borderRadius: scale(8),
+  },
+  confirmButtonText: {
+    color: '#FFFFFF',
+    fontSize: moderateScale(15, 0.3),
+    fontWeight: '600',
   },
 });

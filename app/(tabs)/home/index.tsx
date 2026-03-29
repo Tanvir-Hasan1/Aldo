@@ -22,32 +22,37 @@ interface HomeDashboardData {
   greeting_name: string;
   restaurant_name: string;
   preferred_language: string;
+  available_periods: string[];
+  weekly: PeriodData;
+  monthly: PeriodData;
+  quick_actions: any[];
+  recent_activity: any[];
+}
+
+interface PeriodData {
   metrics: any[];
   cash_management: any[];
-  quick_actions: any[];
   vat_balance: number;
-  weekly_revenue: any[];
+  revenue: any[];
   featured_insight: any;
-  recent_activity: any[];
 }
 
 export default function TabsIndex() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const tokens = useAppStore((state) => state.tokens);
 
   const [data, setData] = useState<HomeDashboardData | null>(null);
+  const [activePeriod, setActivePeriod] = useState<string>("weekly");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchHomeData = async () => {
     try {
-      const [homeRes, docsRes] = await Promise.all([
-        apiClient.get("/api/v1/restaurant/home"),
-        apiClient.get("/api/v1/restaurant/documents")
-      ]);
-      setData(homeRes.data);
-      // Fetched in parallel for background processing
+      const response = await apiClient.get("/api/v1/restaurant/home");
+      setData(response.data);
+      if (response.data.available_periods?.length > 0 && !response.data.available_periods.includes(activePeriod)) {
+        setActivePeriod(response.data.available_periods[0]);
+      }
     } catch (error: any) {
       console.log("API Error:", error.response?.data || error.message);
     } finally {
@@ -64,6 +69,8 @@ export default function TabsIndex() {
     setRefreshing(true);
     fetchHomeData();
   };
+
+  const currentPeriodData = data ? (data as any)[activePeriod] as PeriodData : null;
 
   if (loading) {
     return (
@@ -103,13 +110,17 @@ export default function TabsIndex() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#FA8C4C"]} />}
       >
-        <ActionFilterBar />
-        <KPIGrid metrics={data?.metrics} />
-        <CashManagement cashData={data?.cash_management} />
-        <QuickActions />
-        <VatBalance balance={data?.vat_balance} onPress={() => router.push("/(tabs)/home/vat")} />
-        <RevenueChart weeklyRevenue={data?.weekly_revenue} />
-        <AIInsightBox insight={data?.featured_insight} />
+        <ActionFilterBar 
+          activePeriod={activePeriod}
+          availablePeriods={data?.available_periods || ["weekly", "monthly"]}
+          onPeriodChange={setActivePeriod}
+        />
+        <KPIGrid metrics={currentPeriodData?.metrics} />
+        <CashManagement cashData={currentPeriodData?.cash_management} />
+        <QuickActions items={data?.quick_actions} />
+        <VatBalance balance={currentPeriodData?.vat_balance} onPress={() => router.push("/(tabs)/home/vat")} />
+        <RevenueChart revenue={currentPeriodData?.revenue} period={activePeriod} />
+        <AIInsightBox insight={currentPeriodData?.featured_insight} />
         <RecentActivity activities={data?.recent_activity} />
       </ScrollView>
     </View>

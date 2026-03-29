@@ -3,28 +3,37 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
 
-interface Transaction {
+interface ExpenseItem {
   id: string;
-  title: string;
   category: string;
-  date: string;
-  amount: string;
-  type: string;
+  amount: number;
+  expense_date: string;
+  notes: string;
+  subtitle: string;
+  created_at: string;
 }
 
-const TRANSACTIONS: Transaction[] = [
-  { id: '1', title: 'Employee Salaries', category: 'Staff Costs', date: 'Mar 28, 2026', amount: '-€2,500.00', type: 'Monthly Payroll' },
-  { id: '2', title: 'Electricity', category: 'Property & Utilities', date: 'Jan 27, 2026', amount: '-€300.00', type: 'Utility Bill' },
-  { id: '3', title: 'Cleaning Supplies', category: 'Restaurant Operations', date: 'Feb 27, 2026', amount: '-€120.00', type: 'Stock Refill' },
-  { id: '4', title: 'New Menus Print', category: 'Administrative', date: 'Oct 25, 2025', amount: '-€85.00', type: 'Marketing' },
-];
+interface RecentTransactionsProps {
+  items: ExpenseItem[];
+}
 
-export default function RecentTransactions() {
+export default function RecentTransactions({ items = [] }: RecentTransactionsProps) {
+  if (items.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.sectionTitle}>RECENT TRANSACTIONS</Text>
+        <View style={[styles.transactionCard, { justifyContent: 'center', paddingVertical: verticalScale(30) }]}>
+          <Text style={{ color: '#9CA3AF', fontSize: moderateScale(14) }}>No transactions found</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>RECENT TRANSACTIONS</Text>
 
-      {TRANSACTIONS.map((tx) => (
+      {items.map((tx) => (
         <TouchableOpacity key={tx.id} style={styles.transactionCard}>
           <View style={styles.iconContainer}>
             <Feather name="credit-card" size={moderateScale(18)} color="#FA8C4C" />
@@ -32,12 +41,12 @@ export default function RecentTransactions() {
           
           <View style={styles.detailsContainer}>
             <View style={styles.titleRow}>
-              <Text style={styles.title} numberOfLines={1}>{tx.title}</Text>
-              <Text style={styles.amount}>{tx.amount}</Text>
+              <Text style={styles.title} numberOfLines={1}>{tx.category}</Text>
+              <Text style={styles.amount}>-€{tx.amount.toFixed(2)}</Text>
             </View>
             <View style={styles.subRow}>
-              <Text style={styles.subtitle} numberOfLines={1}>{tx.category} • {tx.date}</Text>
-              <Text style={styles.typeText}>{tx.type}</Text>
+              <Text style={styles.subtitle} numberOfLines={1}>{tx.notes || tx.category} • {tx.expense_date}</Text>
+              <Text style={styles.typeText}>{tx.subtitle}</Text>
             </View>
           </View>
         </TouchableOpacity>

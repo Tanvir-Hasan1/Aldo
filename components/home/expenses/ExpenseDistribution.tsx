@@ -4,23 +4,38 @@ import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 
-export default function ExpenseDistribution() {
+interface DistributionItem {
+  label: string;
+  percentage: number;
+}
+
+interface ExpenseDistributionProps {
+  distribution: DistributionItem[];
+}
+
+const COLORS = ['#FA8C4C', '#94A3B8', '#E2E8F0', '#FDBA74', '#64748B'];
+
+export default function ExpenseDistribution({ distribution = [] }: ExpenseDistributionProps) {
   const size = moderateScale(100);
   const strokeWidth = moderateScale(12);
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   
-  const staffPct = 65;
-  const opsPct = 20;
-  const othersPct = 15;
-
-  const staffLength = (staffPct / 100) * circumference;
-  const opsLength = (opsPct / 100) * circumference;
-  const othersLength = (othersPct / 100) * circumference;
-
-  const staffRotation = -90;
-  const opsRotation = staffRotation + (360 * (staffPct / 100));
-  const othersRotation = opsRotation + (360 * (opsPct / 100));
+  // Calculate rotations and stroke lengths
+  let currentRotation = -90;
+  
+  if (distribution.length === 0) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Expense Distribution</Text>
+        </View>
+        <View style={[styles.content, { justifyContent: 'center', paddingVertical: verticalScale(20) }]}>
+          <Text style={{ color: '#9CA3AF', fontSize: moderateScale(14) }}>No data available</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -33,39 +48,26 @@ export default function ExpenseDistribution() {
         <View style={styles.chartContainer}>
           <Svg width={size} height={size}>
             <G origin={`${size / 2}, ${size / 2}`}>
-              <Circle
-                rotation={staffRotation}
-                origin={`${size / 2}, ${size / 2}`}
-                stroke="#FA8C4C"
-                fill="transparent"
-                strokeWidth={strokeWidth}
-                strokeDasharray={`${staffLength} ${circumference}`}
-                r={radius}
-                cx={size / 2}
-                cy={size / 2}
-              />
-              <Circle
-                rotation={opsRotation}
-                origin={`${size / 2}, ${size / 2}`}
-                stroke="#94A3B8"
-                fill="transparent"
-                strokeWidth={strokeWidth}
-                strokeDasharray={`${opsLength} ${circumference}`}
-                r={radius}
-                cx={size / 2}
-                cy={size / 2}
-              />
-              <Circle
-                rotation={othersRotation}
-                origin={`${size / 2}, ${size / 2}`}
-                stroke="#E2E8F0"
-                fill="transparent"
-                strokeWidth={strokeWidth}
-                strokeDasharray={`${othersLength} ${circumference}`}
-                r={radius}
-                cx={size / 2}
-                cy={size / 2}
-              />
+              {distribution.map((item, index) => {
+                const strokeLength = (item.percentage / 100) * circumference;
+                const rotation = currentRotation;
+                currentRotation += (360 * (item.percentage / 100));
+                
+                return (
+                  <Circle
+                    key={index}
+                    rotation={rotation}
+                    origin={`${size / 2}, ${size / 2}`}
+                    stroke={COLORS[index % COLORS.length]}
+                    fill="transparent"
+                    strokeWidth={strokeWidth}
+                    strokeDasharray={`${strokeLength} ${circumference}`}
+                    r={radius}
+                    cx={size / 2}
+                    cy={size / 2}
+                  />
+                );
+              })}
             </G>
             <SvgText
               fill="#111827"
@@ -75,35 +77,21 @@ export default function ExpenseDistribution() {
               y={size / 2 + moderateScale(4)}
               textAnchor="middle"
             >
-              65%
+              {distribution[0]?.percentage || 0}%
             </SvgText>
           </Svg>
         </View>
 
         <View style={styles.legendContainer}>
-          <View style={styles.legendItem}>
-            <View style={styles.legendLabelGroup}>
-              <View style={[styles.dot, { backgroundColor: '#FA8C4C' }]} />
-              <Text style={styles.legendLabel}>Staff Costs</Text>
+          {distribution.map((item, index) => (
+            <View key={index} style={styles.legendItem}>
+              <View style={styles.legendLabelGroup}>
+                <View style={[styles.dot, { backgroundColor: COLORS[index % COLORS.length] }]} />
+                <Text style={styles.legendLabel} numberOfLines={1}>{item.label}</Text>
+              </View>
+              <Text style={styles.legendValue}>{item.percentage}%</Text>
             </View>
-            <Text style={styles.legendValue}>65%</Text>
-          </View>
-
-          <View style={styles.legendItem}>
-            <View style={styles.legendLabelGroup}>
-              <View style={[styles.dot, { backgroundColor: '#94A3B8' }]} />
-              <Text style={styles.legendLabel}>Operations</Text>
-            </View>
-            <Text style={styles.legendValue}>20%</Text>
-          </View>
-
-          <View style={styles.legendItem}>
-            <View style={styles.legendLabelGroup}>
-              <View style={[styles.dot, { backgroundColor: '#E2E8F0' }]} />
-              <Text style={styles.legendLabel}>Others</Text>
-            </View>
-            <Text style={styles.legendValue}>15%</Text>
-          </View>
+          ))}
         </View>
       </View>
     </View>

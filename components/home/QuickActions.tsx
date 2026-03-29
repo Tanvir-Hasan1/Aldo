@@ -21,38 +21,53 @@ const ActionItem = ({ title, IconComponent, onPress }: ActionItemProps) => {
   );
 };
 
-export default function QuickActions() {
+interface QuickActionsProps {
+  items?: {
+    key: string;
+    label: string;
+  }[];
+}
+
+export default function QuickActions({ items: apiItems }: QuickActionsProps) {
   const router = useRouter();
   
-  const actions: ActionItemProps[] = [
-    { 
-      title: 'Upload Invoice', 
-      IconComponent: DocumentArrowUpIcon,
-      onPress: () => router.push('/(tabs)/home/upload-invoice'),
-    },
-    { 
-      title: 'Data Management', 
-      IconComponent: PencilSquareIcon,
-      onPress: () => router.push('/(tabs)/home/data-management'),
-    },
-    { 
-      title: 'Expenses', 
-      IconComponent: ClipboardDocumentListIcon,
-      onPress: () => router.push('/(tabs)/home/expenses'),
-    },
-    { 
-      title: 'Cash', 
-      IconComponent: CurrencyDollarIcon,
-      onPress: () => router.push('/(tabs)/home/cash-management'),
-    },
+  const getActionData = (key: string) => {
+    switch (key) {
+      case 'upload_invoice':
+        return { IconComponent: DocumentArrowUpIcon, route: '/(tabs)/home/upload-invoice' };
+      case 'daily_data':
+        return { IconComponent: PencilSquareIcon, route: '/(tabs)/home/add-daily-data' };
+      case 'expenses':
+        return { IconComponent: ClipboardDocumentListIcon, route: '/(tabs)/home/expenses' };
+      case 'cash':
+        return { IconComponent: CurrencyDollarIcon, route: '/(tabs)/home/cash-management' };
+      default:
+        return { IconComponent: PencilSquareIcon, route: '/(tabs)/home' };
+    }
+  };
+
+  const fallbackActions = [
+    { key: 'upload_invoice', label: 'Upload Invoice' },
+    { key: 'daily_data', label: 'Add Daily Data' },
+    { key: 'expenses', label: 'Expenses' },
+    { key: 'cash', label: 'Cash' },
   ];
+
+  const displayActions = (apiItems && apiItems.length > 0 ? apiItems : fallbackActions).map(item => {
+    const { IconComponent, route } = getActionData(item.key);
+    return {
+      title: item.label,
+      IconComponent,
+      onPress: () => router.push(route as any),
+    };
+  });
 
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Quick Actions</Text>
       
       <View style={styles.cardContainer}>
-        {actions.map((item) => (
+        {displayActions.map((item: any) => (
           <ActionItem key={item.title} {...item} />
         ))}
       </View>

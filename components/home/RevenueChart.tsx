@@ -9,13 +9,14 @@ interface ChartDataPoint {
 }
 
 interface RevenueChartProps {
-  weeklyRevenue?: {
+  revenue?: {
     label: string;
     value: number;
   }[];
+  period?: string;
 }
 
-export default function RevenueChart({ weeklyRevenue }: RevenueChartProps) {
+export default function RevenueChart({ revenue, period = 'weekly' }: RevenueChartProps) {
   // Mock data to match the screenshot roughly
   const fallbackData: ChartDataPoint[] = [
     { day: 'MON', totalHeight: 35, filledHeight: 25 },
@@ -27,20 +28,22 @@ export default function RevenueChart({ weeklyRevenue }: RevenueChartProps) {
     { day: 'SUN', totalHeight: 75, filledHeight: 65 },
   ];
 
-  const maxVal = Math.max(...(weeklyRevenue?.map(d => d.value) || [1]));
-  const data: ChartDataPoint[] = weeklyRevenue && weeklyRevenue.length > 0
-    ? weeklyRevenue.map(d => ({
-        day: d.label.toUpperCase().substring(0, 3),
+  const maxVal = Math.max(...(revenue?.map(d => d.value) || [1]));
+  const data: ChartDataPoint[] = revenue && revenue.length > 0
+    ? revenue.map(d => ({
+        day: d.label.toUpperCase().substring(0, 3), // e.g., MON, TUE or WEE (for Week)
         totalHeight: 85, 
         filledHeight: maxVal > 0 ? (d.value / maxVal) * 85 : 0
       }))
     : fallbackData;
 
+  const isWeekly = period === 'weekly';
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Weekly Revenue Trend</Text>
-        <Text style={styles.subtext}>Last 7 Days</Text>
+        <Text style={styles.title}>{isWeekly ? 'Weekly' : 'Monthly'} Revenue Trend</Text>
+        <Text style={styles.subtext}>{isWeekly ? 'Last 7 Days' : 'Current Month'}</Text>
       </View>
 
       <View style={styles.chartContainer}>

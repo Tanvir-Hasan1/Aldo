@@ -42,6 +42,18 @@ export default function RecentActivity({ activities: apiActivities }: RecentActi
     }
   };
 
+  const formatTimestamp = (timestamp: string) => {
+    if (!timestamp) return 'JUST NOW';
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+    
+    if (diffHrs < 1) return 'JUST NOW';
+    if (diffHrs < 24) return `${diffHrs}H AGO`;
+    return `${Math.floor(diffHrs / 24)}D AGO`;
+  };
+
   const fallbackActivities: ActivityItemProps[] = [
     { title: 'Invoice uploaded', subtitle: 'Sysco Food Services Ltd.', timeText: '2H AGO', ...getIconForType('invoice') },
     { title: 'Expense added', subtitle: 'Kitchen Utilities - Gas Bill', timeText: '5H AGO', ...getIconForType('expense') },
@@ -51,9 +63,9 @@ export default function RecentActivity({ activities: apiActivities }: RecentActi
   const displayActivities: ActivityItemProps[] = apiActivities && apiActivities.length > 0
     ? apiActivities.map(a => ({
         title: a.title || 'Activity',
-        subtitle: a.subtitle || a.description || '',
-        timeText: a.timeText || a.time || 'JUST NOW',
-        ...getIconForType(a.type)
+        subtitle: a.subtitle || '',
+        timeText: formatTimestamp(a.timestamp),
+        ...getIconForType(a.kind)
       }))
     : (apiActivities ? [] : fallbackActivities);
 

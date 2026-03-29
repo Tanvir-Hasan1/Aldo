@@ -1,15 +1,19 @@
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import Header from "../../../components/ui/Header";
+import { useFocusEffect } from "@react-navigation/native";
+import apiClient from "../../../api/apiClient";
 
 import ExpenseDistribution from "../../../components/home/expenses/ExpenseDistribution";
 import QuickSummary from "../../../components/home/expenses/QuickSummary";
@@ -18,9 +22,50 @@ import RecentTransactions from "../../../components/home/expenses/RecentTransact
 export default function ExpensesScreen() {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState("Today");
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [expenseData, setExpenseData] = useState<any>(null);
 
   const filters = ["Today", "This Week", "This Month", "This Year"];
-  
+
+  const fetchExpenses = async () => {
+    try {
+      setLoading(true);
+      const response = await apiClient.get("/api/v1/restaurant/expenses");
+      setExpenseData(response.data);
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchExpenses();
+    }, [])
+  );
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchExpenses();
+  };
+
+  const getActiveData = () => {
+    if (!expenseData) return null;
+    
+    switch (activeFilter) {
+      case "Today": return expenseData.today;
+      case "This Week": return expenseData.this_week;
+      case "This Month": return expenseData.this_month;
+      case "This Year": return expenseData.this_month; // Fallback
+      default: return expenseData.today;
+    }
+  };
+
+  const activeData = getActiveData();
+
   return (
     <View style={styles.safeArea}>
       <Header title="Expenses" showBack={true} />
@@ -28,6 +73,9 @@ export default function ExpensesScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FA8C4C" />
+        }
       >
         <Text style={styles.pageSubtitle}>
           Track and manage all restaurant operational costs
@@ -62,9 +110,26 @@ export default function ExpensesScreen() {
           })}
         </ScrollView>
 
-        <QuickSummary />
-        <ExpenseDistribution />
-        <RecentTransactions />
+        {loading && !refreshing ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#FA8C4C" />
+          </View>
+        ) : expenseData ? (
+          <>
+            <QuickSummary 
+              todayTotal={expenseData.today?.total || 0}
+              weeklyTotal={expenseData.this_week?.total || 0}
+              monthlyTotal={expenseData.this_month?.total || 0}
+              topCategory={activeData?.top_category || "N/A"}
+            />
+            <ExpenseDistribution distribution={activeData?.distribution || []} />
+            <RecentTransactions items={activeData?.items || []} />
+          </>
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No data available</Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -74,26 +139,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: scale(20),
-    paddingBottom: verticalScale(16),
-  },
-  backButton: {
-    width: moderateScale(40),
-    height: moderateScale(40),
-    borderRadius: moderateScale(20),
-    backgroundColor: "#F9FAFB",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: moderateScale(16, 0.3),
-    fontWeight: "700",
-    color: "#111827",
   },
   scrollContent: {
     paddingHorizontal: scale(20),
@@ -131,6 +176,8 @@ const styles = StyleSheet.create({
     borderColor: '#D1D5DB',
     backgroundColor: '#FFFFFF',
     marginRight: scale(8),
+    height: verticalScale(36),
+    justifyContent: 'center',
   },
   filterPillActive: {
     backgroundColor: '#FA8C4C',
@@ -144,5 +191,19 @@ const styles = StyleSheet.create({
   filterTextActive: {
     color: '#FFFFFF',
     fontWeight: "600",
+  },
+  loadingContainer: {
+    paddingVertical: verticalScale(100),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyContainer: {
+    paddingVertical: verticalScale(100),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    fontSize: moderateScale(16),
+    color: '#9CA3AF',
   },
 });
