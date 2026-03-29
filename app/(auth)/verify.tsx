@@ -44,7 +44,7 @@ export default function VerifyIdentityScreen() {
     
     setIsResending(true);
     try {
-      const apiUrl = process.env.EXPO_PUBLIC_API_URL || "https://risto-ai.vercel.app";
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL;
       const response = await axios.post(`${apiUrl}/api/v1/auth/restaurant/register`, {
         restaurant_name,
         owner_full_name,

@@ -1,8 +1,10 @@
 import { Feather } from "@expo/vector-icons";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
 import axios from "axios";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -12,8 +14,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  Alert,
-  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
@@ -49,6 +49,7 @@ export default function ResetPasswordScreen() {
       const response = await axios.post(`${apiUrl}/api/v1/auth/restaurant/forgot-password`, {
         email
       });
+      console.log("Resend API Response:", response.data);
       Alert.alert("Success", response.data?.message || "Password reset code resent to your email.");
     } catch (error: any) {
       console.log("Resend API Error:", error.response?.data || error.message);
@@ -109,7 +110,7 @@ export default function ResetPasswordScreen() {
 
       const data = response.data;
       Alert.alert("Success", data.message || "Restaurant account password reset successful");
-      
+
       // Route back to login
       router.replace("/(auth)" as any);
 
@@ -213,7 +214,7 @@ export default function ResetPasswordScreen() {
               )}
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.footerContainer}>
             <Text style={styles.footerText}>
               Changed your mind?{" "}

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useAppStore } from "../store/useAppStore";
 
-const apiUrl = process.env.EXPO_PUBLIC_API_URL || "https://risto-ai.vercel.app";
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 const apiClient = axios.create({
   baseURL: apiUrl,
