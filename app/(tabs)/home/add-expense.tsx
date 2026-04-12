@@ -65,17 +65,19 @@ export default function AddExpenseScreen() {
       const day = String(date.getDate()).padStart(2, '0');
       const formattedDate = `${year}-${month}-${day}`;
 
-      await apiClient.post("/api/v1/restaurant/expenses", {
-        category: selectedCategory,
+      const response = await apiClient.post("/api/v1/restaurant/expenses", {
+        category: selectedCategory.toLowerCase(),
         amount: parseFloat(amount) || 0,
         expense_date: formattedDate,
         notes: notes
       });
 
+      console.log("Expense API Response:", response.data);
+
       // Navigate back on success (as requested: no alert)
       router.back();
-    } catch (error) {
-      console.error("Error saving expense:", error);
+    } catch (error: any) {
+      console.error("Error saving expense:", error?.response?.data || error.message);
     } finally {
       setLoading(false);
     }

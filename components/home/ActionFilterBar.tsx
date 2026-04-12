@@ -1,18 +1,23 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
-import { ArrowDownTrayIcon, ChevronDownIcon } from 'react-native-heroicons/outline';
+import React, { useState } from "react";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ArrowDownTrayIcon,
+  ChevronDownIcon,
+} from "react-native-heroicons/outline";
+import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 
 interface ActionFilterBarProps {
   activePeriod: string;
   availablePeriods: string[];
   onPeriodChange: (period: string) => void;
+  onExport?: (format: "pdf" | "excel") => void;
 }
 
-export default function ActionFilterBar({ 
-  activePeriod, 
-  availablePeriods, 
-  onPeriodChange 
+export default function ActionFilterBar({
+  activePeriod,
+  availablePeriods,
+  onPeriodChange,
+  onExport,
 }: ActionFilterBarProps) {
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [isPeriodMenuOpen, setIsPeriodMenuOpen] = useState(false);
@@ -23,7 +28,7 @@ export default function ActionFilterBar({
     <View style={styles.container}>
       <View style={styles.spacer} />
       <View style={styles.actionsGroup}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.actionButton}
           onPress={() => setIsExportMenuOpen(true)}
         >
@@ -31,7 +36,7 @@ export default function ActionFilterBar({
           <Text style={styles.actionText}>Export Data</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.filterButton}
           onPress={() => setIsPeriodMenuOpen(true)}
         >
@@ -47,22 +52,28 @@ export default function ActionFilterBar({
         animationType="fade"
         onRequestClose={() => setIsExportMenuOpen(false)}
       >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1} 
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
           onPress={() => setIsExportMenuOpen(false)}
         >
           <View style={[styles.dropdownMenu, { right: scale(100) }]}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.exportOptionBtn}
-              onPress={() => setIsExportMenuOpen(false)}
+              onPress={() => {
+                setIsExportMenuOpen(false);
+                if (onExport) onExport("pdf");
+              }}
             >
               <Text style={styles.exportOptionText}>PDF</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.exportOptionBtn}
-              onPress={() => setIsExportMenuOpen(false)}
+              onPress={() => {
+                setIsExportMenuOpen(false);
+                if (onExport) onExport("excel");
+              }}
             >
               <Text style={styles.exportOptionText}>Excel</Text>
             </TouchableOpacity>
@@ -77,28 +88,33 @@ export default function ActionFilterBar({
         animationType="fade"
         onRequestClose={() => setIsPeriodMenuOpen(false)}
       >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1} 
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
           onPress={() => setIsPeriodMenuOpen(false)}
         >
           <View style={[styles.dropdownMenu, { right: scale(20) }]}>
             {availablePeriods.map((period) => (
-              <TouchableOpacity 
+              <TouchableOpacity
                 key={period}
                 style={[
-                  styles.exportOptionBtn, 
-                  activePeriod === period && { borderColor: '#FA8C4C', backgroundColor: '#FFF0E5' }
+                  styles.exportOptionBtn,
+                  activePeriod === period && {
+                    borderColor: "#FA8C4C",
+                    backgroundColor: "#FFF0E5",
+                  },
                 ]}
                 onPress={() => {
                   onPeriodChange(period);
                   setIsPeriodMenuOpen(false);
                 }}
               >
-                <Text style={[
-                  styles.exportOptionText,
-                  activePeriod === period && { color: '#FA8C4C' }
-                ]}>
+                <Text
+                  style={[
+                    styles.exportOptionText,
+                    activePeriod === period && { color: "#FA8C4C" },
+                  ]}
+                >
                   {formatPeriod(period)}
                 </Text>
               </TouchableOpacity>
@@ -112,24 +128,24 @@ export default function ActionFilterBar({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: verticalScale(20),
   },
   spacer: {
     flex: 1,
   },
   actionsGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
     paddingHorizontal: scale(12),
     paddingVertical: verticalScale(6),
     borderRadius: scale(8),
@@ -137,36 +153,36 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: moderateScale(12, 0.3),
-    fontWeight: '600',
-    color: '#374151',
+    fontWeight: "600",
+    color: "#374151",
     marginLeft: scale(6),
   },
   filterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF0E5',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF0E5",
     paddingHorizontal: scale(12),
     paddingVertical: verticalScale(6),
     borderRadius: scale(8),
   },
   filterText: {
     fontSize: moderateScale(12, 0.3),
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    color: "#111827",
     marginRight: scale(6),
   },
   modalOverlay: {
     flex: 1,
   },
   dropdownMenu: {
-    position: 'absolute',
-    top: verticalScale(160), // Measured roughly below the export button considering safe area
+    position: "absolute",
+    top: verticalScale(125), // Measured roughly below the export button considering safe area
     right: scale(100), // Positioned under the Export button
-    backgroundColor: '#E5E7EB', // Light grey container
+    backgroundColor: "#E5E7EB", // Light grey container
     borderRadius: scale(8),
     padding: scale(6),
     width: scale(100),
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
@@ -174,16 +190,16 @@ const styles = StyleSheet.create({
   },
   exportOptionBtn: {
     paddingVertical: verticalScale(6),
-    alignItems: 'center',
-    backgroundColor: 'transparent',
+    alignItems: "center",
+    backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: '#111827',
+    borderColor: "#111827",
     borderRadius: scale(4),
     marginBottom: verticalScale(6),
   },
   exportOptionText: {
     fontSize: moderateScale(12, 0.3),
-    fontWeight: '500',
-    color: '#111827',
+    fontWeight: "500",
+    color: "#111827",
   },
 });

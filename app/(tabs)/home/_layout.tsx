@@ -7,7 +7,7 @@ export default function HomeLayout() {
       <Stack.Screen
         name="vat"
         options={{
-          headerShown: true,
+          headerShown: false,
           headerTitle: "VAT Overview",
           headerTitleAlign: "center",
           headerShadowVisible: false,
@@ -27,56 +27,56 @@ export default function HomeLayout() {
         name="data-management"
         options={{
           headerShown: false,
-          presentation: 'card',
-          animation: 'slide_from_right'
+          presentation: "card",
+          animation: "slide_from_right",
         }}
       />
       <Stack.Screen
         name="add-daily-data"
         options={{
           headerShown: false,
-          presentation: 'card',
-          animation: 'slide_from_right'
+          presentation: "card",
+          animation: "slide_from_right",
         }}
       />
       <Stack.Screen
         name="daily-record-details"
         options={{
           headerShown: false,
-          presentation: 'card',
-          animation: 'slide_from_right'
+          presentation: "card",
+          animation: "slide_from_right",
         }}
       />
       <Stack.Screen
         name="expenses"
         options={{
           headerShown: false,
-          presentation: 'card',
-          animation: 'slide_from_right'
+          presentation: "card",
+          animation: "slide_from_right",
         }}
       />
       <Stack.Screen
         name="add-expense"
         options={{
           headerShown: false,
-          presentation: 'card',
-          animation: 'slide_from_right'
+          presentation: "card",
+          animation: "slide_from_right",
         }}
       />
       <Stack.Screen
         name="cash-management"
         options={{
           headerShown: false,
-          presentation: 'card',
-          animation: 'slide_from_right'
+          presentation: "card",
+          animation: "slide_from_right",
         }}
       />
       <Stack.Screen
         name="add-bank-deposit"
         options={{
           headerShown: false,
-          presentation: 'card',
-          animation: 'slide_from_right'
+          presentation: "card",
+          animation: "slide_from_right",
         }}
       />
     </Stack>

@@ -3,39 +3,48 @@ import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
 
-export default function ActivityCostSection() {
+interface ActivityCostData {
+  label: string;
+  value: number;
+}
+
+interface ActivityCostSectionProps {
+  coversActivity: ActivityCostData[];
+  costBreakdown: ActivityCostData[];
+}
+
+export default function ActivityCostSection({ coversActivity, costBreakdown }: ActivityCostSectionProps) {
   return (
     <View style={styles.container}>
       {/* Covers Activity */}
       <View style={styles.card}>
         <Text style={styles.title}>Covers Activity</Text>
-        <View style={styles.row}>
-          <View style={styles.subRow}>
-            <Feather name="sun" size={moderateScale(14)} color="#F59E0B" />
-            <Text style={styles.label}>Lunch</Text>
+        {coversActivity.map((item, index) => (
+          <View key={index} style={styles.row}>
+            <View style={styles.subRow}>
+              <Feather 
+                name={item.label.toLowerCase() === 'lunch' ? 'sun' : 'moon'} 
+                size={moderateScale(14)} 
+                color={item.label.toLowerCase() === 'lunch' ? '#F59E0B' : '#6366F1'} 
+              />
+              <Text style={styles.label}>{item.label}</Text>
+            </View>
+            <Text style={styles.value}>{item.value}</Text>
           </View>
-          <Text style={styles.value}>312</Text>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.subRow}>
-            <Feather name="moon" size={moderateScale(14)} color="#6366F1" />
-            <Text style={styles.label}>Dinner</Text>
-          </View>
-          <Text style={styles.value}>530</Text>
-        </View>
+        ))}
       </View>
 
       {/* Cost % */}
       <View style={styles.card}>
         <Text style={styles.title}>Cost %</Text>
-        <View style={styles.row}>
-          <Text style={styles.label}>Food Cost</Text>
-          <Text style={[styles.value, { color: '#EF4444' }]}>28%</Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Staff Cost</Text>
-          <Text style={[styles.value, { color: '#F59E0B' }]}>32%</Text>
-        </View>
+        {costBreakdown.map((item, index) => (
+          <View key={index} style={styles.row}>
+            <Text style={styles.label}>{item.label}</Text>
+            <Text style={[styles.value, { color: index === 0 ? '#EF4444' : '#F59E0B' }]}>
+              {item.value}%
+            </Text>
+          </View>
+        ))}
       </View>
     </View>
   );

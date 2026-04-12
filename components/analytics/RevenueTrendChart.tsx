@@ -2,42 +2,45 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 
-const DATA = [
-  { day: 'M', height: 40, active: false },
-  { day: 'T', height: 60, active: false },
-  { day: 'W', height: 50, active: false },
-  { day: 'T', height: 80, active: true },
-  { day: 'F', height: 45, active: false },
-  { day: 'S', height: 0, active: false },
-  { day: 'S', height: 0, active: false },
-];
+interface RevenueTrendChartProps {
+  weeklyRevenue: Array<{ label: string; value: number }>;
+  totalRevenue: number;
+  changePercent: number;
+}
 
-export default function RevenueTrendChart() {
+export default function RevenueTrendChart({ weeklyRevenue, totalRevenue, changePercent }: RevenueTrendChartProps) {
+  const maxValue = Math.max(...weeklyRevenue.map(item => item.value), 1);
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Revenue Trend</Text>
-          <Text style={styles.value}>$12,450</Text>
+          <Text style={styles.value}>${totalRevenue.toLocaleString()}</Text>
         </View>
-        <Text style={styles.trend}>+12.5% <Text style={styles.trendSub}>Last Week</Text></Text>
+        <Text style={[styles.trend, { color: changePercent >= 0 ? '#10B981' : '#EF4444' }]}>
+          {changePercent >= 0 ? '+' : ''}{changePercent}% <Text style={styles.trendSub}>Last Week</Text>
+        </Text>
       </View>
 
       <View style={styles.chartContainer}>
-        {DATA.map((item, index) => (
-          <View key={index} style={styles.barGroup}>
-            <View style={styles.barBackground}>
-              <View 
-                style={[
-                  styles.bar, 
-                  { height: `${item.height}%` },
-                  item.active ? styles.barActive : styles.barInactive
-                ]} 
-              />
+        {weeklyRevenue.map((item, index) => {
+          const heightPercent = maxValue > 0 ? (item.value / maxValue) * 100 : 0;
+          return (
+            <View key={index} style={styles.barGroup}>
+              <View style={styles.barBackground}>
+                <View 
+                  style={[
+                    styles.bar, 
+                    { height: `${Math.max(heightPercent, 5)}%` }, // Minimum 5% height for visibility if value is > 0
+                    styles.barActive
+                  ]} 
+                />
+              </View>
+              <Text style={styles.dayText}>{item.label}</Text>
             </View>
-            <Text style={[styles.dayText, item.active && styles.dayTextActive]}>{item.day}</Text>
-          </View>
-        ))}
+          );
+        })}
       </View>
     </View>
   );

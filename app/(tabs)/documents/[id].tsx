@@ -1,40 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, Platform, Alert } from 'react-native';
-import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
-import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
-import Header from '../../../components/ui/Header';
+import { useFocusEffect } from "@react-navigation/native";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import apiClient from "../../../api/apiClient";
+import Header from "../../../components/ui/Header";
 import { useAppStore } from "../../../store/useAppStore";
 
-import DocumentPreview from '../../../components/documents/document-details/DocumentPreview';
-import DocumentInformation from '../../../components/documents/document-details/DocumentInformation';
-import ExtractedData from '../../../components/documents/document-details/ExtractedData';
-import * as FileSystem from 'expo-file-system/legacy';
+import * as FileSystem from "expo-file-system/legacy";
+import * as Sharing from "expo-sharing";
+import DetailsActions from "../../../components/documents/document-details/DetailsActions";
+import DocumentInformation from "../../../components/documents/document-details/DocumentInformation";
+import DocumentPreview from "../../../components/documents/document-details/DocumentPreview";
+import ExtractedData from "../../../components/documents/document-details/ExtractedData";
 const { StorageAccessFramework } = FileSystem;
-import * as Sharing from 'expo-sharing';
-import DetailsActions from '../../../components/documents/document-details/DetailsActions';
 
 export default function DocumentDetailsScreen() {
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
   const tokens = useAppStore((state) => state.tokens);
-  
+
   const [data, setData] = useState<any>(null);
   const [editableData, setEditableData] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
 
-  const apiUrl = process.env.EXPO_PUBLIC_API_URL || "https://risto-ai.vercel.app";
+  const apiUrl =
+    process.env.EXPO_PUBLIC_API_URL || "https://risto-ai.vercel.app";
   // Add a cache-busting timestamp to the image URL
   const [timestamp, setTimestamp] = useState(Date.now());
   const imageUrl = `${apiUrl}/api/v1/restaurant/documents/${id}/download-image?t=${timestamp}`;
 
   const fetchDetails = async () => {
     try {
-      const response = await apiClient.get(`/api/v1/restaurant/documents/${id}`);
+      const response = await apiClient.get(
+        `/api/v1/restaurant/documents/${id}`,
+      );
       setData(response.data);
       setTimestamp(Date.now());
     } catch (error) {
@@ -45,14 +55,21 @@ export default function DocumentDetailsScreen() {
   };
 
   const handleEdit = () => {
-    const subtotal = (data.line_items || []).reduce((sum: number, item: any) => sum + (item.total_price || 0), 0);
-    const vatAmount = data.vat_amount !== undefined ? data.vat_amount : subtotal * 0.10;
-    const totalAmount = data.total_amount !== undefined ? data.total_amount : subtotal + vatAmount;
+    const subtotal = (data.line_items || []).reduce(
+      (sum: number, item: any) => sum + (item.total_price || 0),
+      0,
+    );
+    const vatAmount =
+      data.vat_amount !== undefined ? data.vat_amount : subtotal * 0.1;
+    const totalAmount =
+      data.total_amount !== undefined
+        ? data.total_amount
+        : subtotal + vatAmount;
 
-    setEditableData({ 
+    setEditableData({
       ...data,
       vat_amount: vatAmount,
-      total_amount: totalAmount
+      total_amount: totalAmount,
     });
     setIsEditing(true);
   };
@@ -66,14 +83,17 @@ export default function DocumentDetailsScreen() {
     setEditableData((prev: any) => {
       const newData = {
         ...prev,
-        [key]: (key === 'total_amount' || key === 'vat_amount') ? parseFloat(value) || 0 : value
+        [key]:
+          key === "total_amount" || key === "vat_amount"
+            ? parseFloat(value) || 0
+            : value,
       };
 
       // If user manually updates total, we'll let them, but usually it's driven by items
       // If we must 'calculate and add' from a base:
-      if (key === 'total_amount') {
+      if (key === "total_amount") {
         const baseAmount = parseFloat(value) || 0;
-        newData.vat_amount = baseAmount * 0.10;
+        newData.vat_amount = baseAmount * 0.1;
         newData.total_amount = baseAmount + newData.vat_amount;
       }
 
@@ -86,24 +106,31 @@ export default function DocumentDetailsScreen() {
       const newItems = [...prev.line_items];
       newItems[index] = {
         ...newItems[index],
-        [key]: (key === 'quantity' || key === 'unit_price') ? parseFloat(value) || 0 : value
+        [key]:
+          key === "quantity" || key === "unit_price"
+            ? parseFloat(value) || 0
+            : value,
       };
-      
+
       // Re-calculate total price for the item if quantity or unit_price changed
-      if (key === 'quantity' || key === 'unit_price') {
-        newItems[index].total_price = newItems[index].quantity * newItems[index].unit_price;
+      if (key === "quantity" || key === "unit_price") {
+        newItems[index].total_price =
+          newItems[index].quantity * newItems[index].unit_price;
       }
 
       // Re-calculate overall amounts
-      const subtotal = newItems.reduce((sum, item) => sum + (item.total_price || 0), 0);
-      const newVatAmount = subtotal * 0.10;
+      const subtotal = newItems.reduce(
+        (sum, item) => sum + (item.total_price || 0),
+        0,
+      );
+      const newVatAmount = subtotal * 0.1;
       const newTotalAmount = subtotal + newVatAmount;
 
-      return { 
-        ...prev, 
-        line_items: newItems, 
+      return {
+        ...prev,
+        line_items: newItems,
         total_amount: newTotalAmount,
-        vat_amount: newVatAmount 
+        vat_amount: newVatAmount,
       };
     });
   };
@@ -111,19 +138,22 @@ export default function DocumentDetailsScreen() {
   const handleUpdate = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.patch(`/api/v1/restaurant/documents/${id}`, {
-        supplier_name: editableData.supplier_name,
-        invoice_number: editableData.invoice_number,
-        invoice_date: editableData.invoice_date,
-        total_amount: editableData.total_amount,
-        line_items: editableData.line_items.map((item: any) => ({
-          product_name: item.product_name,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          total_price: item.total_price
-        }))
-      });
-      
+      const response = await apiClient.patch(
+        `/api/v1/restaurant/documents/${id}`,
+        {
+          supplier_name: editableData.supplier_name,
+          invoice_number: editableData.invoice_number,
+          invoice_date: editableData.invoice_date,
+          total_amount: editableData.total_amount,
+          line_items: editableData.line_items.map((item: any) => ({
+            product_name: item.product_name,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            total_price: item.total_price,
+          })),
+        },
+      );
+
       setData(response.data);
       setTimestamp(Date.now());
       setIsEditing(false);
@@ -142,9 +172,9 @@ export default function DocumentDetailsScreen() {
       "Are you sure you want to delete this document? This action cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
-        { 
-          text: "Delete", 
-          style: "destructive", 
+        {
+          text: "Delete",
+          style: "destructive",
           onPress: async () => {
             try {
               setLoading(true);
@@ -152,12 +182,15 @@ export default function DocumentDetailsScreen() {
               router.back();
             } catch (error) {
               console.error("Error deleting document:", error);
-              Alert.alert("Error", "Failed to delete document. Please try again.");
+              Alert.alert(
+                "Error",
+                "Failed to delete document. Please try again.",
+              );
               setLoading(false);
             }
-          } 
-        }
-      ]
+          },
+        },
+      ],
     );
   };
 
@@ -169,13 +202,14 @@ export default function DocumentDetailsScreen() {
       const downloadUrl = `${apiUrl}/api/v1/restaurant/documents/${id}/download?t=${timestamp}`;
       const fileName = `invoice_${id}.pdf`;
 
-      if (Platform.OS === 'android') {
-        const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync();
+      if (Platform.OS === "android") {
+        const permissions =
+          await StorageAccessFramework.requestDirectoryPermissionsAsync();
         if (permissions.granted) {
           const fileUri = await StorageAccessFramework.createFileAsync(
             permissions.directoryUri,
             fileName,
-            'application/pdf'
+            "application/pdf",
           );
 
           // Use a custom fetch/blob download since downloadAsync doesn't directly write to SAF URIs easily
@@ -185,12 +219,14 @@ export default function DocumentDetailsScreen() {
             },
           });
           const blob = await response.blob();
-          
+
           // Need to convert blob to base64 to write to SAF
           const reader = new FileReader();
           reader.onload = async () => {
-            const base64 = (reader.result as string).split(',')[1];
-            await FileSystem.writeAsStringAsync(fileUri, base64, { encoding: FileSystem.EncodingType.Base64 });
+            const base64 = (reader.result as string).split(",")[1];
+            await FileSystem.writeAsStringAsync(fileUri, base64, {
+              encoding: FileSystem.EncodingType.Base64,
+            });
             alert("Downloaded successfully to your selected folder.");
           };
           reader.readAsDataURL(blob);
@@ -201,7 +237,10 @@ export default function DocumentDetailsScreen() {
         const { uri } = await FileSystem.downloadAsync(downloadUrl, fileUri, {
           headers: { Authorization: `Bearer ${tokens.access_token}` },
         });
-        await Sharing.shareAsync(uri, { UTI: 'com.adobe.pdf', mimeType: 'application/pdf' });
+        await Sharing.shareAsync(uri, {
+          UTI: "com.adobe.pdf",
+          mimeType: "application/pdf",
+        });
       }
     } catch (error) {
       console.error("Download Error:", error);
@@ -241,12 +280,17 @@ export default function DocumentDetailsScreen() {
           },
         });
       };
-    }, [navigation])
+    }, [navigation]),
   );
 
   if (loading) {
     return (
-      <View style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View
+        style={[
+          styles.safeArea,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         <ActivityIndicator size="large" color="#FA8C4C" />
       </View>
     );
@@ -258,38 +302,72 @@ export default function DocumentDetailsScreen() {
     <View style={styles.safeArea}>
       <Header title="Document Details" showBack={true} />
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <DocumentPreview 
-          status={data.status === 'processed' ? 'Processed' : 'Pending Review'} 
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <DocumentPreview
+          status={data.status === "processed" ? "Processed" : "Pending Review"}
           imageUrl={imageUrl}
           token={tokens?.access_token}
         />
-        
-        <DocumentInformation 
-          supplierName={isEditing ? editableData.supplier_name : data.supplier_name}
-          invoiceNumber={isEditing ? editableData.invoice_number : data.invoice_number_display?.replace(/^Inv\s+/i, "")}
-          totalAmount={isEditing ? String(editableData.total_amount) : `€${(data.total_amount !== undefined ? data.total_amount : (data.line_items || []).reduce((sum: number, item: any) => sum + (item.total_price || 0), 0) * 1.1).toFixed(2)}`}
-          invoiceDate={isEditing ? editableData.invoice_date : data.invoice_date_formatted}
-          uploadDate={data.upload_date_formatted}
-          vatAmount={isEditing ? String(editableData.vat_amount?.toFixed(2)) : `€${(data.vat_amount !== undefined ? data.vat_amount : (data.line_items || []).reduce((sum: number, item: any) => sum + (item.total_price || 0), 0) * 0.1).toFixed(2)}`}
+
+        <DocumentInformation
+          supplierName={
+            isEditing ? editableData.supplier_name : data.supplier_name
+          }
+          invoiceNumber={
+            isEditing
+              ? editableData.invoice_number
+              : (
+                  data.invoice_number_display ||
+                  data.invoice_number ||
+                  "N/A"
+                ).replace(/^Inv\s+/i, "")
+          }
+          totalAmount={
+            isEditing
+              ? String(editableData.total_amount)
+              : `€${(data.total_amount !== undefined ? data.total_amount : (data.line_items || []).reduce((sum: number, item: any) => sum + (item.total_price || 0), 0) * 1.1).toFixed(2)}`
+          }
+          invoiceDate={
+            isEditing
+              ? editableData.invoice_date
+              : data.invoice_date_formatted || data.invoice_date || "N/A"
+          }
+          uploadDate={
+            (data.upload_date_formatted || data.upload_date || "N/A").split(
+              "T",
+            )[0]
+          }
+          vatAmount={
+            isEditing
+              ? String(editableData.vat_amount?.toFixed(2))
+              : `€${(data.vat_amount !== undefined ? data.vat_amount : (data.line_items || []).reduce((sum: number, item: any) => sum + (item.total_price || 0), 0) * 0.1).toFixed(2)}`
+          }
           isEditing={isEditing}
           onChange={handleInfoChange}
         />
-        
-        <ExtractedData 
-          items={(isEditing ? editableData.line_items : (data.line_items || [])).map((item: any, idx: number) => ({
+
+        <ExtractedData
+          items={(isEditing
+            ? editableData.line_items
+            : data.line_items || []
+          ).map((item: any, idx: number) => ({
             id: String(idx),
             name: item.product_name,
             qty: item.quantity,
-            unitPrice: isEditing ? String(item.unit_price) : `€${item.unit_price.toFixed(2)}`,
-            totalPrice: `€${item.total_price.toFixed(2)}`
-          }))} 
+            unitPrice: isEditing
+              ? String(item.unit_price)
+              : `€${item.unit_price.toFixed(2)}`,
+            totalPrice: `€${item.total_price.toFixed(2)}`,
+          }))}
           isEditing={isEditing}
           onItemChange={handleItemChange}
         />
-        
-        <DetailsActions 
-          onDownload={handleDownload} 
+
+        <DetailsActions
+          onDownload={handleDownload}
           onDelete={handleDelete}
           isEditing={isEditing}
           onEdit={handleEdit}
@@ -304,15 +382,15 @@ export default function DocumentDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   container: {
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: scale(20),
     paddingBottom: verticalScale(16),
   },
@@ -320,14 +398,14 @@ const styles = StyleSheet.create({
     width: moderateScale(40),
     height: moderateScale(40),
     borderRadius: moderateScale(20),
-    backgroundColor: '#F3F4F6',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#F3F4F6",
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerTitle: {
     fontSize: moderateScale(16, 0.3),
-    fontWeight: '700',
-    color: '#111827',
+    fontWeight: "700",
+    color: "#111827",
   },
   scrollContent: {
     paddingHorizontal: scale(20),

@@ -4,7 +4,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SparklesIcon } from 'react-native-heroicons/solid';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 
-export default function AnalyticsAIInsightCard() {
+interface AnalyticsAIInsightCardProps {
+  insight: {
+    title: string;
+    subtitle: string;
+  };
+}
+
+export default function AnalyticsAIInsightCard({ insight }: AnalyticsAIInsightCardProps) {
   return (
     <LinearGradient
       colors={['#111111', '#B47B12']} // Darkish to gold-ish gradient based on image
@@ -14,10 +21,10 @@ export default function AnalyticsAIInsightCard() {
     >
       <View style={styles.header}>
         <SparklesIcon size={moderateScale(16)} color="#FB923C" />
-        <Text style={styles.title}>AI Business Insight</Text>
+        <Text style={styles.title}>{insight.title}</Text>
       </View>
       <Text style={styles.content}>
-        <Text style={styles.highlight}>Optimization Tip:</Text> Staffing costs are 5% higher on Tuesdays relative to revenue.
+        {insight.subtitle}
       </Text>
     </LinearGradient>
   );

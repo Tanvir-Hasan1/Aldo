@@ -2,32 +2,50 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 
-export default function CashMetrics() {
+interface CashMetricsProps {
+  summary: {
+    total_collected: number;
+    cash_available: number;
+    withdrawals_total: number;
+    bank_deposits_total: number;
+  };
+  status: {
+    total_collected: string;
+    cash_available: string;
+    withdrawals: string;
+    bank_deposits: string;
+  };
+}
+
+export default function CashMetrics({ summary, status }: CashMetricsProps) {
+  // Helpers
+  const formatCurrency = (val: number) => `€${val?.toFixed(2) || '0.00'}`;
+  
   return (
     <View style={styles.container}>
       <View style={styles.row}>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Total Collected</Text>
-          <Text style={styles.cardValue}>€2,450.00</Text>
-          <Text style={styles.tagGreen}>TODAY</Text>
+          <Text style={styles.cardValue}>{formatCurrency(summary.total_collected)}</Text>
+          <Text style={styles.tagGreen}>{status.total_collected}</Text>
         </View>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Cash Available</Text>
-          <Text style={styles.cardValue}>€1,120.50</Text>
-          <Text style={styles.tagOrange}>IN SAFE</Text>
+          <Text style={styles.cardValue}>{formatCurrency(summary.cash_available)}</Text>
+          <Text style={styles.tagOrange}>{status.cash_available}</Text>
         </View>
       </View>
       
       <View style={styles.row}>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Withdrawals</Text>
-          <Text style={styles.cardValue}>€340.00</Text>
-          <Text style={styles.tagGrey}>TODAY</Text>
+          <Text style={styles.cardValue}>{formatCurrency(summary.withdrawals_total)}</Text>
+          <Text style={styles.tagGrey}>{status.withdrawals}</Text>
         </View>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Bank Deposits</Text>
-          <Text style={styles.cardValue}>€990.00</Text>
-          <Text style={styles.tagGrey}>TODAY</Text>
+          <Text style={styles.cardValue}>{formatCurrency(summary.bank_deposits_total)}</Text>
+          <Text style={styles.tagGrey}>{status.bank_deposits}</Text>
         </View>
       </View>
     </View>

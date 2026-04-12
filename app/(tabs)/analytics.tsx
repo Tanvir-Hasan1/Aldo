@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
 
@@ -12,7 +12,54 @@ import RevenueComparisonChart from '../../components/analytics/RevenueComparison
 import ActivityCostSection from '../../components/analytics/ActivityCostSection';
 import SupplierPriceAlerts from '../../components/analytics/SupplierPriceAlerts';
 
+import { useAppStore } from '../../store/useAppStore';
+
+import ActionFilterBar from '../../components/home/ActionFilterBar';
+import apiClient from '../../api/apiClient';
+import { generateAnalyticsPdfExport, generateAnalyticsExcelExport } from '../../utils/exportData';
+
 export default function AnalyticsScreen() {
+  const analyticsData = useAppStore((state) => state.analyticsData);
+  const setAnalyticsData = useAppStore((state) => state.setAnalyticsData);
+  
+  const [activePeriod, setActivePeriod] = React.useState('weekly');
+  const [loading, setLoading] = React.useState(false);
+
+  const fetchAnalyticsData = async (period: string) => {
+    try {
+      setLoading(true);
+      const response = await apiClient.get(`/api/v1/restaurant/analytics/overview?period=${period}`);
+      setAnalyticsData(response.data);
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePeriodChange = (period: string) => {
+    setActivePeriod(period);
+    fetchAnalyticsData(period);
+  };
+
+  const handleExport = async (format: 'pdf' | 'excel') => {
+    if (!analyticsData) return;
+    
+    if (format === 'pdf') {
+      await generateAnalyticsPdfExport({ analyticsData, period: activePeriod });
+    } else {
+      await generateAnalyticsExcelExport({ analyticsData, period: activePeriod });
+    }
+  };
+
+  if (!analyticsData || loading) {
+    return (
+      <View style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#FA8C4C" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.safeArea}>
       <Header title="Analytics" showBell={true} />
@@ -21,25 +68,27 @@ export default function AnalyticsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.topControls}>
-          <TouchableOpacity style={styles.exportButton}>
-            <Feather name="download" size={moderateScale(14)} color="#111827" />
-            <Text style={styles.exportText}>Export Data</Text>
-          </TouchableOpacity>
+        <ActionFilterBar 
+          activePeriod={activePeriod}
+          availablePeriods={['weekly', 'monthly']}
+          onPeriodChange={handlePeriodChange}
+          onExport={handleExport}
+        />
 
-          <TouchableOpacity style={styles.filterDropdown}>
-            <Text style={styles.filterText}>Weekly</Text>
-            <Feather name="chevron-down" size={moderateScale(14)} color="#111827" />
-          </TouchableOpacity>
-        </View>
-
-        <AnalyticsAIInsightCard />
-        <SummaryCards />
-        <RevenueTrendChart />
-        <StatsSelector />
-        <RevenueComparisonChart />
-        <ActivityCostSection />
-        <SupplierPriceAlerts />
+        <AnalyticsAIInsightCard insight={analyticsData.insight_banner} />
+        <SummaryCards metrics={analyticsData.metric_tiles} />
+        <RevenueTrendChart 
+          weeklyRevenue={analyticsData.weekly_revenue} 
+          totalRevenue={analyticsData.revenue_total}
+          changePercent={analyticsData.revenue_change_percent}
+        />
+        <StatsSelector stats={analyticsData.summary_stats} />
+        <RevenueComparisonChart comparison={analyticsData.revenue_comparison} />
+        <ActivityCostSection 
+          coversActivity={analyticsData.covers_activity} 
+          costBreakdown={analyticsData.cost_breakdown} 
+        />
+        <SupplierPriceAlerts alerts={analyticsData.supplier_price_alerts} />
       </ScrollView>
     </View>
   );

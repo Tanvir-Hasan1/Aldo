@@ -3,25 +3,45 @@ import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
 
-export default function SummaryCards() {
+interface SummaryCardData {
+  label: string;
+  value: any;
+  change_percent?: number;
+  subtitle?: string;
+}
+
+interface SummaryCardsProps {
+  metrics: SummaryCardData[];
+}
+
+export default function SummaryCards({ metrics }: SummaryCardsProps) {
   return (
     <View style={styles.container}>
-      {/* Estimated Profit */}
-      <View style={styles.card}>
-        <Text style={styles.label}>Estimated Profit</Text>
-        <Text style={styles.value}>$4,820</Text>
-        <View style={styles.trendContainer}>
-          <Feather name="trending-up" size={moderateScale(14)} color="#10B981" />
-          <Text style={styles.trendText}>+8.2%</Text>
-        </View>
-      </View>
+      {metrics.map((card, index) => (
+        <View key={index} style={styles.card}>
+          <Text style={styles.label}>{card.label}</Text>
+          <Text style={styles.value}>
+            {typeof card.value === 'number' ? `$${card.value.toLocaleString()}` : card.value}
+          </Text>
+          
+          {card.change_percent !== undefined && (
+            <View style={styles.trendContainer}>
+              <Feather 
+                name={card.change_percent >= 0 ? "trending-up" : "trending-down"} 
+                size={moderateScale(14)} 
+                color={card.change_percent >= 0 ? "#10B981" : "#EF4444"} 
+              />
+              <Text style={[styles.trendText, { color: card.change_percent >= 0 ? "#10B981" : "#EF4444" }]}>
+                {card.change_percent >= 0 ? '+' : ''}{card.change_percent}%
+              </Text>
+            </View>
+          )}
 
-      {/* Peak Hour */}
-      <View style={styles.card}>
-        <Text style={styles.label}>Peak Hour</Text>
-        <Text style={styles.value}>7:00 PM</Text>
-        <Text style={styles.subtext}>92% Capacity Avg</Text>
-      </View>
+          {card.subtitle && (
+            <Text style={styles.subtext}>{card.subtitle}</Text>
+          )}
+        </View>
+      ))}
     </View>
   );
 }

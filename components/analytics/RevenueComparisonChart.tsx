@@ -2,30 +2,33 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 
-export default function RevenueComparisonChart() {
+interface RevenueComparisonChartProps {
+  comparison: Array<{ label: string; value: number }>;
+}
+
+export default function RevenueComparisonChart({ comparison }: RevenueComparisonChartProps) {
+  const maxValue = Math.max(...comparison.map(item => item.value), 1);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Revenue Comparison</Text>
       
-      <View style={styles.row}>
-        <View style={styles.labelRow}>
-          <Text style={styles.label}>This Week Revenue</Text>
-          <Text style={styles.value}>$12,450</Text>
-        </View>
-        <View style={styles.barContainer}>
-          <View style={[styles.bar, { width: '100%', backgroundColor: '#FB923C' }]} />
-        </View>
-      </View>
-
-      <View style={styles.row}>
-        <View style={styles.labelRow}>
-          <Text style={styles.label}>Last Week Revenue</Text>
-          <Text style={styles.value}>$11,060</Text>
-        </View>
-        <View style={styles.barContainer}>
-          <View style={[styles.bar, { width: '85%', backgroundColor: '#CBD5E1' }]} />
-        </View>
-      </View>
+      {comparison.map((item, index) => {
+        const widthPercent = (item.value / maxValue) * 100;
+        const color = index === 0 ? '#FB923C' : '#CBD5E1';
+        
+        return (
+          <View key={index} style={styles.row}>
+            <View style={styles.labelRow}>
+              <Text style={styles.label}>{item.label}</Text>
+              <Text style={styles.value}>${item.value.toLocaleString()}</Text>
+            </View>
+            <View style={styles.barContainer}>
+              <View style={[styles.bar, { width: `${widthPercent}%`, backgroundColor: color }]} />
+            </View>
+          </View>
+        );
+      })}
     </View>
   );
 }

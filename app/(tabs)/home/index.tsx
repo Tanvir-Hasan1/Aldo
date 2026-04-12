@@ -16,7 +16,7 @@ import QuickActions from "../../../components/home/QuickActions";
 import RecentActivity from "../../../components/home/RecentActivity";
 import RevenueChart from "../../../components/home/RevenueChart";
 import VatBalance from "../../../components/home/VatBalance";
-
+import { generatePdfExport, generateExcelExport } from "../../../utils/exportData";
 
 interface HomeDashboardData {
   greeting_name: string;
@@ -41,6 +41,8 @@ export default function TabsIndex() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
+  const setAnalyticsData = useAppStore((state) => state.setAnalyticsData);
+  const setCashOverviewData = useAppStore((state) => state.setCashOverviewData);
   const [data, setData] = useState<HomeDashboardData | null>(null);
   const [activePeriod, setActivePeriod] = useState<string>("weekly");
   const [loading, setLoading] = useState(true);
@@ -48,10 +50,18 @@ export default function TabsIndex() {
 
   const fetchHomeData = async () => {
     try {
-      const response = await apiClient.get("/api/v1/restaurant/home");
-      setData(response.data);
-      if (response.data.available_periods?.length > 0 && !response.data.available_periods.includes(activePeriod)) {
-        setActivePeriod(response.data.available_periods[0]);
+      const [homeRes, analyticsRes, cashOverviewRes] = await Promise.all([
+        apiClient.get("/api/v1/restaurant/home"),
+        apiClient.get("/api/v1/restaurant/analytics/overview"),
+        apiClient.get("/api/v1/restaurant/cash/overview")
+      ]);
+      
+      setData(homeRes.data);
+      setAnalyticsData(analyticsRes.data);
+      setCashOverviewData(cashOverviewRes.data);
+
+      if (homeRes.data.available_periods?.length > 0 && !homeRes.data.available_periods.includes(activePeriod)) {
+        setActivePeriod(homeRes.data.available_periods[0]);
       }
     } catch (error: any) {
       console.log("API Error:", error.response?.data || error.message);
@@ -71,6 +81,24 @@ export default function TabsIndex() {
   };
 
   const currentPeriodData = data ? (data as any)[activePeriod] as PeriodData : null;
+
+  const handleExport = async (format: 'pdf' | 'excel') => {
+    if (!currentPeriodData) return;
+
+    if (format === 'pdf') {
+      await generatePdfExport({
+        metrics: currentPeriodData.metrics,
+        cashData: currentPeriodData.cash_management,
+        period: activePeriod,
+      });
+    } else if (format === 'excel') {
+      await generateExcelExport({
+        metrics: currentPeriodData.metrics,
+        cashData: currentPeriodData.cash_management,
+        period: activePeriod,
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -114,6 +142,7 @@ export default function TabsIndex() {
           activePeriod={activePeriod}
           availablePeriods={data?.available_periods || ["weekly", "monthly"]}
           onPeriodChange={setActivePeriod}
+          onExport={handleExport}
         />
         <KPIGrid metrics={currentPeriodData?.metrics} />
         <CashManagement cashData={currentPeriodData?.cash_management} />

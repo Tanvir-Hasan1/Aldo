@@ -2,25 +2,31 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 
-const TABS = [
-  { label: 'Revenue', value: '$12.4k', active: true },
-  { label: 'Covers', value: '842', active: false },
-  { label: 'Avg Rev', value: '$14.78', active: false },
-];
+interface StatsSelectorProps {
+  stats: Array<{ label: string; value: any }>;
+}
 
-export default function StatsSelector() {
+export default function StatsSelector({ stats }: StatsSelectorProps) {
+  const [activeIndex, setActiveIndex] = React.useState(0);
+
   return (
     <View style={styles.container}>
-      {TABS.map((tab, index) => (
-        <TouchableOpacity 
-          key={index} 
-          style={[styles.tab, tab.active && styles.tabActive]}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.label, tab.active && styles.labelActive]}>{tab.label}</Text>
-          <Text style={[styles.value, tab.active && styles.valueActive]}>{tab.value}</Text>
-        </TouchableOpacity>
-      ))}
+      {stats.map((tab, index) => {
+        const isActive = index === activeIndex;
+        return (
+          <TouchableOpacity 
+            key={index} 
+            style={[styles.tab, isActive && styles.tabActive]}
+            activeOpacity={0.7}
+            onPress={() => setActiveIndex(index)}
+          >
+            <Text style={[styles.label, isActive && styles.labelActive]}>{tab.label}</Text>
+            <Text style={[styles.value, isActive && styles.valueActive]}>
+              {typeof tab.value === 'number' ? `$${tab.value.toLocaleString()}` : tab.value}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
