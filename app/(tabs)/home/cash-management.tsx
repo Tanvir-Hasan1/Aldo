@@ -83,22 +83,13 @@ export default function CashManagementScreen() {
             Track and manage your restaurant's physical cash flow and bank deposits.
           </Text>
 
-          <View style={{ flexDirection: 'row', gap: scale(12), marginBottom: verticalScale(20) }}>
-            <TouchableOpacity 
-              style={[styles.actionButton, { backgroundColor: '#FA8C4C' }]}
-              onPress={() => router.push('/(tabs)/home/add-bank-deposit')}
-            >
-              <Feather name="plus" size={moderateScale(18)} color="#FFFFFF" style={{ marginRight: scale(6) }} />
-              <Text style={styles.actionButtonText}>Deposit</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.actionButton, { backgroundColor: '#EF4444' }]}
-            >
-              <Feather name="minus" size={moderateScale(18)} color="#FFFFFF" style={{ marginRight: scale(6) }} />
-              <Text style={styles.actionButtonText}>Withdraw</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity 
+            style={styles.addDepositButton}
+            onPress={() => router.push('/(tabs)/home/add-bank-deposit')}
+          >
+            <Feather name="plus" size={moderateScale(20)} color="#FFFFFF" style={{ marginRight: scale(8) }} />
+            <Text style={styles.addDepositButtonText}>Add Bank Deposit</Text>
+          </TouchableOpacity>
 
           <ScrollView 
             horizontal 
@@ -169,15 +160,16 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(20),
     lineHeight: moderateScale(20),
   },
-  actionButton: {
-    flex: 1,
+  addDepositButton: {
     flexDirection: "row",
+    backgroundColor: "#FA8C4C",
     borderRadius: scale(12),
     paddingVertical: verticalScale(14),
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: verticalScale(20),
   },
-  actionButtonText: {
+  addDepositButtonText: {
     color: "#FFFFFF",
     fontSize: moderateScale(16, 0.3),
     fontWeight: "600",
