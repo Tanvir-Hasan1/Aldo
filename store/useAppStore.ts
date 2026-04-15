@@ -61,6 +61,14 @@ export interface CashOverviewData {
   };
 }
 
+export interface VatOverviewData {
+  estimated_vat_balance: number;
+  vat_payable: number;
+  vat_receivable: number;
+  filing_deadline: string;
+  report_ready: boolean;
+}
+
 interface AppState {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
@@ -68,10 +76,12 @@ interface AppState {
   tokens: Tokens | null;
   analyticsData: AnalyticsData | null;
   cashOverviewData: CashOverviewData | null;
+  vatOverviewData: VatOverviewData | null;
   setUser: (user: User | null, tokens?: Tokens | null) => void;
   setTokens: (tokens: Tokens | null) => void;
   setAnalyticsData: (data: AnalyticsData | null) => void;
   setCashOverviewData: (data: CashOverviewData | null) => void;
+  setVatOverviewData: (data: VatOverviewData | null) => void;
   logout: () => void;
 }
 
@@ -85,16 +95,19 @@ export const useAppStore = create<AppState>()(
       tokens: null,
       analyticsData: null,
       cashOverviewData: null,
+      vatOverviewData: null,
       setUser: (user, tokens = null) => set({ user, tokens }),
       setTokens: (tokens: Tokens | null) => set({ tokens }),
       setAnalyticsData: (data) => set({ analyticsData: data }),
       setCashOverviewData: (data) => set({ cashOverviewData: data }),
+      setVatOverviewData: (data) => set({ vatOverviewData: data }),
       logout: () =>
         set({
           user: null,
           tokens: null,
           analyticsData: null,
           cashOverviewData: null,
+          vatOverviewData: null,
         }),
     }),
     {
