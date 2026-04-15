@@ -9,18 +9,89 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import Header from "../../../components/ui/Header";
+import apiClient from "../../../api/apiClient";
 
-import Method1Form from "../../../components/home/add-daily-data/Method1Form";
-import Method2Form from "../../../components/home/add-daily-data/Method2Form";
+import Method1Form, { Method1Data } from "../../../components/home/add-daily-data/Method1Form";
+import Method2Form, { Method2Data } from "../../../components/home/add-daily-data/Method2Form";
 import MethodSelector from "../../../components/home/add-daily-data/MethodSelector";
 
 export default function AddDailyDataScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const [selectedMethod, setSelectedMethod] = useState<"method1" | "method2">("method1");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const [method1Data, setMethod1Data] = useState<Method1Data>({
+    pos_payments: "",
+    cash_withdrawals: "",
+    cash_in: "",
+    cash_out: "",
+    expenses_in_cash: "",
+    notes: "",
+  });
+
+  const [method2Data, setMethod2Data] = useState<Method2Data>({
+    pos_payments: "",
+    cash_payments: "",
+    bank_transfer_payments: "",
+    lunch_covers: "",
+    dinner_covers: "",
+    opening_cash: "",
+    closing_cash: "",
+  });
+
+  const handleMethod1Change = (key: keyof Method1Data, val: string) => {
+    setMethod1Data((prev) => ({ ...prev, [key]: val }));
+  };
+
+  const handleMethod2Change = (key: keyof Method2Data, val: string) => {
+    setMethod2Data((prev) => ({ ...prev, [key]: val }));
+  };
+
+  const currentBusinessDate = new Date().toISOString().split("T")[0];
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const payload = {
+        method: selectedMethod === "method1" ? "method_1" : "method_2",
+        method_one: {
+          business_date: currentBusinessDate,
+          pos_payments: parseFloat(method1Data.pos_payments) || 0,
+          cash_withdrawals: parseFloat(method1Data.cash_withdrawals) || 0,
+          cash_in: parseFloat(method1Data.cash_in) || 0,
+          cash_out: parseFloat(method1Data.cash_out) || 0,
+          expenses_in_cash: parseFloat(method1Data.expenses_in_cash) || 0,
+          notes: method1Data.notes,
+        },
+        method_two: {
+          business_date: currentBusinessDate,
+          pos_payments: parseFloat(method2Data.pos_payments) || 0,
+          cash_payments: parseFloat(method2Data.cash_payments) || 0,
+          bank_transfer_payments: parseFloat(method2Data.bank_transfer_payments) || 0,
+          lunch_covers: parseInt(method2Data.lunch_covers) || 0,
+          dinner_covers: parseInt(method2Data.dinner_covers) || 0,
+          opening_cash: parseFloat(method2Data.opening_cash) || 0,
+          closing_cash: parseFloat(method2Data.closing_cash) || 0,
+        }
+      };
+
+      const res = await apiClient.post("/api/v1/restaurant/manual-entry", payload);
+      console.log("Manual Entry Response:", res.data);
+      Alert.alert("Success", "Daily data has been saved successfully.");
+      router.back();
+    } catch (error) {
+      console.error("Error saving manual entry:", error);
+      Alert.alert("Error", "Could not save. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <View style={styles.safeArea}>
@@ -41,13 +112,23 @@ export default function AddDailyDataScreen() {
 
           <MethodSelector selected={selectedMethod} onSelect={setSelectedMethod} />
 
-          {selectedMethod === "method1" ? <Method1Form /> : <Method2Form />}
+          {selectedMethod === "method1" ? (
+            <Method1Form data={method1Data} onChange={handleMethod1Change} />
+          ) : (
+            <Method2Form data={method2Data} onChange={handleMethod2Change} />
+          )}
         </ScrollView>
 
         <View style={styles.bottomFooter}>
-          <TouchableOpacity style={styles.saveButton}>
-            <Feather name="save" size={moderateScale(18)} color="#FFFFFF" style={styles.saveIcon} />
-            <Text style={styles.saveButtonText}>Save Daley Data</Text>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={isSaving}>
+            {isSaving ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <>
+                <Feather name="save" size={moderateScale(18)} color="#FFFFFF" style={styles.saveIcon} />
+                <Text style={styles.saveButtonText}>Save Daily Data</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

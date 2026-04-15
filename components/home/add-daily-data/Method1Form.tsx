@@ -3,7 +3,21 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-nativ
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
 
-export default function Method1Form() {
+export interface Method1Data {
+  pos_payments: string;
+  cash_withdrawals: string;
+  cash_in: string;
+  cash_out: string;
+  expenses_in_cash: string;
+  notes: string;
+}
+
+interface Props {
+  data: Method1Data;
+  onChange: (key: keyof Method1Data, val: string) => void;
+}
+
+export default function Method1Form({ data, onChange }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.sectionHeader}>
@@ -17,7 +31,7 @@ export default function Method1Form() {
         <Text style={styles.label}>POS Payments (+)</Text>
         <View style={styles.inputContainer}>
           <Feather name="credit-card" size={moderateScale(20)} color="#FA8C4C" style={styles.icon} />
-          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.pos_payments} onChangeText={(val) => onChange('pos_payments', val)} />
           <Text style={styles.currency}>USD</Text>
         </View>
       </View>
@@ -26,7 +40,7 @@ export default function Method1Form() {
         <Text style={styles.label}>Cash Withdrawals (+)</Text>
         <View style={styles.inputContainer}>
           <Feather name="briefcase" size={moderateScale(20)} color="#FA8C4C" style={styles.icon} />
-          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.cash_withdrawals} onChangeText={(val) => onChange('cash_withdrawals', val)} />
           <Text style={styles.currency}>USD</Text>
         </View>
       </View>
@@ -35,13 +49,13 @@ export default function Method1Form() {
         <View style={[styles.inputGroup, { flex: 1, marginRight: scale(8) }]}>
           <Text style={styles.label}>Cash In (-)</Text>
           <View style={styles.inputContainer}>
-            <TextInput style={[styles.input, { paddingLeft: scale(16) }]} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+            <TextInput style={[styles.input, { paddingLeft: scale(16) }]} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.cash_in} onChangeText={(val) => onChange('cash_in', val)} />
           </View>
         </View>
         <View style={[styles.inputGroup, { flex: 1, marginLeft: scale(8) }]}>
           <Text style={styles.label}>Cash Out (+)</Text>
           <View style={styles.inputContainer}>
-            <TextInput style={[styles.input, { paddingLeft: scale(16) }]} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+            <TextInput style={[styles.input, { paddingLeft: scale(16) }]} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.cash_out} onChangeText={(val) => onChange('cash_out', val)} />
           </View>
         </View>
       </View>
@@ -56,9 +70,17 @@ export default function Method1Form() {
         </View>
         <View style={styles.inputContainer}>
           <Feather name="file-text" size={moderateScale(20)} color="#FA8C4C" style={styles.icon} />
-          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.expenses_in_cash} onChangeText={(val) => onChange('expenses_in_cash', val)} />
           <Text style={styles.currency}>USD</Text>
         </View>
+        <TextInput 
+          style={[styles.inputContainer, { height: verticalScale(80), paddingTop: verticalScale(12), paddingHorizontal: scale(16), marginTop: verticalScale(8) }]} 
+          multiline 
+          placeholder="Notes..." 
+          placeholderTextColor="#9CA3AF"
+          value={data.notes}
+          onChangeText={(val) => onChange('notes', val)}
+        />
       </View>
     </View>
   );

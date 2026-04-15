@@ -3,7 +3,22 @@ import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
 
-export default function Method2Form() {
+export interface Method2Data {
+  pos_payments: string;
+  cash_payments: string;
+  bank_transfer_payments: string;
+  lunch_covers: string;
+  dinner_covers: string;
+  opening_cash: string;
+  closing_cash: string;
+}
+
+interface Props {
+  data: Method2Data;
+  onChange: (key: keyof Method2Data, val: string) => void;
+}
+
+export default function Method2Form({ data, onChange }: Props) {
   return (
     <View style={styles.container}>
       {/* Payment Inputs */}
@@ -21,7 +36,7 @@ export default function Method2Form() {
         <Text style={styles.label}>POS Payments (+)</Text>
         <View style={styles.inputContainer}>
           <Text style={styles.prefixSign}>€</Text>
-          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.pos_payments} onChangeText={(val) => onChange('pos_payments', val)} />
         </View>
       </View>
 
@@ -29,7 +44,7 @@ export default function Method2Form() {
         <Text style={styles.label}>Cash Payments (+)</Text>
         <View style={styles.inputContainer}>
           <Text style={styles.prefixSign}>€</Text>
-          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.cash_payments} onChangeText={(val) => onChange('cash_payments', val)} />
         </View>
       </View>
 
@@ -37,7 +52,7 @@ export default function Method2Form() {
         <Text style={styles.label}>Invoices Paid by Bank Transfer (+)</Text>
         <View style={styles.inputContainer}>
           <Text style={styles.prefixSign}>€</Text>
-          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+          <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.bank_transfer_payments} onChangeText={(val) => onChange('bank_transfer_payments', val)} />
         </View>
       </View>
 
@@ -53,13 +68,13 @@ export default function Method2Form() {
         <View style={[styles.inputGroup, { flex: 1, marginRight: scale(8) }]}>
           <Text style={styles.label}>Lunch Covers</Text>
           <View style={styles.inputContainer}>
-            <TextInput style={[styles.input, { paddingLeft: scale(16) }]} placeholder="0" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+            <TextInput style={[styles.input, { paddingLeft: scale(16) }]} placeholder="0" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.lunch_covers} onChangeText={(val) => onChange('lunch_covers', val)} />
           </View>
         </View>
         <View style={[styles.inputGroup, { flex: 1, marginLeft: scale(8) }]}>
           <Text style={styles.label}>Dinner Covers</Text>
           <View style={styles.inputContainer}>
-            <TextInput style={[styles.input, { paddingLeft: scale(16) }]} placeholder="0" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+            <TextInput style={[styles.input, { paddingLeft: scale(16) }]} placeholder="0" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.dinner_covers} onChangeText={(val) => onChange('dinner_covers', val)} />
           </View>
         </View>
       </View>
@@ -78,7 +93,7 @@ export default function Method2Form() {
           <Text style={styles.subLabel}>Amount of cash in the register at the beginning of the day</Text>
           <View style={styles.inputContainerBgWhite}>
             <Text style={styles.prefixSign}>$</Text>
-            <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+            <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.opening_cash} onChangeText={(val) => onChange('opening_cash', val)} />
           </View>
         </View>
 
@@ -87,7 +102,7 @@ export default function Method2Form() {
           <Text style={styles.subLabel}>Amount of cash counted in the register at the end of the day</Text>
           <View style={styles.inputContainerBgWhite}>
             <Text style={styles.prefixSign}>$</Text>
-            <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" />
+            <TextInput style={styles.input} placeholder="0.00" placeholderTextColor="#9CA3AF" keyboardType="numeric" value={data.closing_cash} onChangeText={(val) => onChange('closing_cash', val)} />
           </View>
         </View>
       </View>
