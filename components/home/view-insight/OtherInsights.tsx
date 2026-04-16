@@ -3,36 +3,39 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { BanknotesIcon, ReceiptPercentIcon } from 'react-native-heroicons/outline';
 
-const insights = [
-  {
-    title: "Profit decrease",
-    value: "-4.2%",
-    icon: <BanknotesIcon size={moderateScale(18)} color="#EF4444" />,
-    backgroundColor: '#FFFFFF'
-  },
-  {
-    title: "Expense increase",
-    value: "+$1,240",
-    icon: <ReceiptPercentIcon size={moderateScale(18)} color="#FB923C" />,
-    backgroundColor: '#FFFFFF'
-  }
-];
+interface Insight {
+  label: string;
+  value: string;
+  subtitle?: string | null;
+}
 
-export default function OtherInsights() {
+interface OtherInsightsProps {
+  insights?: Insight[];
+}
+
+export default function OtherInsights({ insights = [] }: OtherInsightsProps) {
+  if (!insights || insights.length === 0) return null;
   return (
     <View style={styles.container}>
       <Text style={styles.headerTitle}>Other Related Insights</Text>
       
       <View style={styles.list}>
-        {insights.map((insight, index) => (
-          <View key={index} style={styles.card}>
-            <View style={styles.iconContainer}>
-              {insight.icon}
+        {insights.map((insight, index) => {
+          // Dynamic Icon assignment can be done here. Let's vary by index if we must, or default.
+          const IconComponent = index % 2 === 0 
+            ? <BanknotesIcon size={moderateScale(18)} color="#EF4444" /> 
+            : <ReceiptPercentIcon size={moderateScale(18)} color="#FB923C" />;
+            
+          return (
+            <View key={index} style={styles.card}>
+              <View style={styles.iconContainer}>
+                {IconComponent}
+              </View>
+              <Text style={styles.title}>{insight.label}</Text>
+              <Text style={styles.value}>{insight.value}</Text>
             </View>
-            <Text style={styles.title}>{insight.title}</Text>
-            <Text style={styles.value}>{insight.value}</Text>
-          </View>
-        ))}
+          );
+        })}
       </View>
     </View>
   );

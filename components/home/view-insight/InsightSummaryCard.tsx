@@ -3,32 +3,59 @@ import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { ArrowTrendingUpIcon } from 'react-native-heroicons/solid';
 
-export default function InsightSummaryCard() {
-  const chartData = [
-    { day: 'MON', height: verticalScale(50), color: '#E5E7EB' },
-    { day: 'TUE', height: verticalScale(70), color: '#E5E7EB' },
-    { day: 'WED', height: verticalScale(60), color: '#E5E7EB' },
-    { day: 'THU', height: verticalScale(80), color: '#E5E7EB' },
-    { day: 'FRI', height: verticalScale(90), color: '#E5E7EB' },
-    { day: 'SAT', height: verticalScale(100), color: '#FDE68A' }, // Yellowish
-    { day: 'SUN', height: verticalScale(120), color: '#FB923C' }, // Orange
-  ];
+interface InsightSummaryCardProps {
+  title: string;
+  priority: string;
+  metricValue: string;
+  metricCaption: string;
+  trend: { label: string; value: number }[];
+}
+
+export default function InsightSummaryCard({ 
+  title, 
+  priority, 
+  metricValue, 
+  metricCaption, 
+  trend 
+}: InsightSummaryCardProps) {
+  // Map trend values to heights and colors. We'll find max value to scale heights.
+  // We use fallback to 1s to prevent division by 0 if all values are 0.
+  const maxVal = Math.max(...(trend || []).map(t => t.value), 1);
+  const minHeight = 10; // minimum visible height
+  const maxHeight = 120; // maximum bar height allowed via stylesheet base assumption
+
+  const chartData = (trend || []).map((item, index, arr) => {
+    // scale height relative to maxVal
+    const calculatedHeight = Math.max((item.value / maxVal) * maxHeight, minHeight);
+    
+    // Default color logic: light grey for most, highlight last two if they represent 'recent' 
+    // Or we could derive color dynamically. For now, last item is dark orange, second last is light orange.
+    let color = '#E5E7EB';
+    if (index === arr.length - 1) color = '#FB923C';
+    else if (index === arr.length - 2) color = '#FDE68A';
+
+    return {
+      day: item.label,
+      height: verticalScale(calculatedHeight),
+      color: color
+    };
+  });
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>HIGH PRIORITY</Text>
+          <Text style={styles.badgeText}>{(priority || 'HIGH').toUpperCase()} PRIORITY</Text>
         </View>
         <View style={styles.trendIconContainer}>
           <ArrowTrendingUpIcon size={moderateScale(18)} color="#EF4444" />
         </View>
       </View>
       
-      <Text style={styles.title}>Food Cost Increased</Text>
+      <Text style={styles.title}>{title}</Text>
       <View style={styles.statsContainer}>
-        <Text style={styles.percentage}>12%</Text>
-        <Text style={styles.subtext}>increase this week</Text>
+        <Text style={styles.percentage}>{metricValue}</Text>
+        <Text style={styles.subtext}>{metricCaption}</Text>
       </View>
       
       <View style={styles.chartContainer}>

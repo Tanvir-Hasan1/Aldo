@@ -3,28 +3,18 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { SparklesIcon, DocumentTextIcon, AdjustmentsHorizontalIcon, TrashIcon } from 'react-native-heroicons/outline';
 
-const actions = [
-  {
-    title: "Review supplier prices",
-    description: "Compare with 3 local alternatives for poultry.",
-    icon: <DocumentTextIcon size={moderateScale(20)} color="#FB923C" />,
-    color: '#FB923C'
-  },
-  {
-    title: "Optimize portion sizes",
-    description: "Adjust standard garnish weights on 4 items.",
-    icon: <AdjustmentsHorizontalIcon size={moderateScale(20)} color="#FB923C" />,
-    color: '#FB923C'
-  },
-  {
-    title: "Monitor ingredient waste",
-    description: "Run a daily waste audit for the next 7 days.",
-    icon: <TrashIcon size={moderateScale(20)} color="#FB923C" />,
-    color: '#FB923C'
-  }
-];
+interface Action {
+  title: string;
+  description: string;
+  action_label: string;
+}
 
-export default function RecommendedActions() {
+interface RecommendedActionsProps {
+  actions?: Action[];
+}
+
+export default function RecommendedActions({ actions = [] }: RecommendedActionsProps) {
+  if (!actions || actions.length === 0) return null;
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -32,20 +22,24 @@ export default function RecommendedActions() {
         <Text style={styles.headerTitle}>Recommended Actions</Text>
       </View>
       
-      {actions.map((action, index) => (
-        <View key={index} style={styles.actionCard}>
-          <View style={styles.iconContainer}>
-            {action.icon}
+      {actions.map((action, index) => {
+        // Just use DocumentTextIcon generically for api items
+        const IconComponent = <DocumentTextIcon size={moderateScale(20)} color="#FB923C" />;
+        return (
+          <View key={index} style={styles.actionCard}>
+            <View style={styles.iconContainer}>
+              {IconComponent}
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.actionTitle}>{action.title}</Text>
+              <Text style={styles.actionDescription}>{action.description}</Text>
+            </View>
+            <TouchableOpacity>
+              <Text style={styles.applyText}>{action.action_label || 'Apply'}</Text>
+            </TouchableOpacity>
           </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.actionTitle}>{action.title}</Text>
-            <Text style={styles.actionDescription}>{action.description}</Text>
-          </View>
-          <TouchableOpacity>
-            <Text style={styles.applyText}>Apply</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 }

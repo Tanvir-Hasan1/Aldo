@@ -7,10 +7,12 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { ArrowDownTrayIcon, BellIcon } from "react-native-heroicons/outline";
 import { Feather } from "@expo/vector-icons";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
+import apiClient from "../../../api/apiClient";
 
 // Components
 import InsightSummaryCard from "../../../components/home/view-insight/InsightSummaryCard";
@@ -21,6 +23,22 @@ import RootCauses from "../../../components/home/view-insight/RootCauses";
 export default function ViewInsightScreen() {
   const router = useRouter();
   const navigation = useNavigation();
+  const [data, setData] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchInsight = async () => {
+      try {
+        const response = await apiClient.get('/api/v1/restaurant/insights');
+        setData(response.data);
+      } catch (error) {
+        console.error("Failed to fetch insights:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInsight();
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -96,10 +114,24 @@ export default function ViewInsightScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <InsightSummaryCard />
-        <RootCauses />
-        <RecommendedActions />
-        <OtherInsights />
+        {loading ? (
+          <ActivityIndicator size="large" color="#FA8C4C" style={{ marginTop: verticalScale(40) }} />
+        ) : data ? (
+          <>
+            <InsightSummaryCard 
+              title={data.title}
+              priority={data.priority}
+              metricValue={data.metric_value}
+              metricCaption={data.metric_caption}
+              trend={data.trend}
+            />
+            <RootCauses causes={data.root_causes} />
+            <RecommendedActions actions={data.recommended_actions} />
+            <OtherInsights insights={data.other_related_insights} />
+          </>
+        ) : (
+          <Text style={{ textAlign: "center", marginTop: verticalScale(40) }}>No insight available</Text>
+        )}
       </ScrollView>
 
       <View

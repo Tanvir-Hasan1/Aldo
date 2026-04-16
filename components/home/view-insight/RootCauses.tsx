@@ -3,13 +3,12 @@ import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { ChartBarSquareIcon } from 'react-native-heroicons/outline';
 
-const causes = [
-  "Supplier price increase (Poultry & Dairy)",
-  "Higher ingredient usage in main courses",
-  "Increased food waste in prep station"
-];
+interface RootCausesProps {
+  causes?: string[];
+}
 
-export default function RootCauses() {
+export default function RootCauses({ causes = [] }: RootCausesProps) {
+  if (!causes || causes.length === 0) return null;
   return (
     <View style={styles.container}>
       <View style={styles.header}>
