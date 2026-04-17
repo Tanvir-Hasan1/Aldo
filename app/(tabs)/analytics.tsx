@@ -24,12 +24,17 @@ export default function AnalyticsScreen() {
   
   const [activePeriod, setActivePeriod] = React.useState('weekly');
   const [loading, setLoading] = React.useState(false);
+  const [businessInsight, setBusinessInsight] = React.useState<any>(null);
 
   const fetchAnalyticsData = async (period: string) => {
     try {
       setLoading(true);
-      const response = await apiClient.get(`/api/v1/restaurant/analytics/overview?period=${period}`);
-      setAnalyticsData(response.data);
+      const [overviewRes, insightRes] = await Promise.all([
+        apiClient.get(`/api/v1/restaurant/analytics/overview?period=${period}`),
+        apiClient.get('/api/v1/restaurant/analytics/business-insight')
+      ]);
+      setAnalyticsData(overviewRes.data);
+      setBusinessInsight(insightRes.data);
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {
@@ -75,7 +80,7 @@ export default function AnalyticsScreen() {
           onExport={handleExport}
         />
 
-        <AnalyticsAIInsightCard insight={analyticsData.insight_banner} />
+        <AnalyticsAIInsightCard insight={businessInsight || analyticsData.insight_banner} />
         <SummaryCards metrics={analyticsData.metric_tiles} />
         <RevenueTrendChart 
           weeklyRevenue={analyticsData.weekly_revenue} 
