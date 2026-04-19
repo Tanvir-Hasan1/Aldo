@@ -3,8 +3,10 @@ import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { useTranslation } from '../../../utils/i18n';
 
 export function InventoryCard({ item }: { item: any }) {
+  const { t } = useTranslation();
   return (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
@@ -15,18 +17,20 @@ export function InventoryCard({ item }: { item: any }) {
           <Text style={styles.cardName}>{item.name}</Text>
           <Text style={styles.cardSupplier}>{item.supplier}</Text>
         </View>
-        <Text style={[styles.statusBadge, { color: item.statusColor }]}>{item.status}</Text>
+        <Text style={[styles.statusBadge, { color: item.statusColor }]}>
+          {t(item.status.toLowerCase().replace(/ /g, '_') as any).toUpperCase()}
+        </Text>
       </View>
 
       <View style={styles.cardFooter}>
         <View>
-          <Text style={styles.footerLabel}>STOCK QUANTITY</Text>
+          <Text style={styles.footerLabel}>{t('stock_quantity')}</Text>
           <Text style={styles.footerValue}>
             {item.quantity} {item.unit}
           </Text>
         </View>
         <View>
-          <Text style={styles.footerLabel}>LAST PURCHASE</Text>
+          <Text style={styles.footerLabel}>{t('last_purchase')}</Text>
           <Text style={styles.footerValue}>{item.lastPurchase}</Text>
         </View>
         <TouchableOpacity

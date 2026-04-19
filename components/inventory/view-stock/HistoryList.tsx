@@ -2,14 +2,16 @@ import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { useTranslation } from '../../../utils/i18n';
 
 export function HistoryList({ item }: { item: any }) {
+  const { t } = useTranslation();
   return (
     <View>
       <View style={styles.historyHeader}>
-        <Text style={styles.sectionTitle}>History</Text>
+        <Text style={styles.sectionTitle}>{t('history')}</Text>
         <TouchableOpacity>
-          <Text style={styles.viewAllText}>View All</Text>
+          <Text style={styles.viewAllText}>{t('see_all')}</Text>
         </TouchableOpacity>
       </View>
 

@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import Header from "../../../components/ui/Header";
+import { useTranslation } from '../../../utils/i18n';
 
 import { FilterChips } from '../../../components/inventory/Inventory/FilterChips';
 import { InventoryCard } from '../../../components/inventory/Inventory/InventoryCard';
@@ -116,6 +117,7 @@ const TOTAL_VALUE = 12450;
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
 export default function InventoryScreen() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
@@ -130,7 +132,7 @@ export default function InventoryScreen() {
 
   return (
     <View style={styles.safe}>
-      <Header title="Inventory" showBell={true} />
+      <Header title={t('inventory_title')} showBell={true} />
 
       {/* Search */}
       <View style={styles.searchRow}>
@@ -138,7 +140,7 @@ export default function InventoryScreen() {
           <Feather name="search" size={moderateScale(16)} color="#9CA3AF" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search products"
+            placeholder={t('search_products')}
             placeholderTextColor="#9CA3AF"
             value={search}
             onChangeText={setSearch}
@@ -162,20 +164,20 @@ export default function InventoryScreen() {
       >
         {/* Title */}
         <View style={{ paddingHorizontal: scale(20), marginBottom: verticalScale(12) }}>
-          <Text style={styles.pageTitle}>Inventory</Text>
+          <Text style={styles.pageTitle}>{t('inventory_title')}</Text>
           <Text style={styles.pageSubtitle}>
-            Track and manage your restaurant ingredients and stock.
+            {t('inventory_subtitle')}
           </Text>
         </View>
 
         {/* Total value card */}
         <View style={styles.valueCard}>
-          <Text style={styles.valueLabelSmall}>TOTAL INVENTORY VALUE</Text>
+          <Text style={styles.valueLabelSmall}>{t('total_inventory_value')}</Text>
           <Text style={styles.valueAmount}>${TOTAL_VALUE.toLocaleString()}.00</Text>
           <View style={styles.valueBadge}>
             <Feather name="trending-up" size={moderateScale(12)} color="#16A34A" />
             <Text style={styles.valueBadgeText}> +4.2%</Text>
-            <Text style={styles.valueBadgeSub}>  from month</Text>
+            <Text style={styles.valueBadgeSub}>  {t('from_month')}</Text>
           </View>
         </View>
 

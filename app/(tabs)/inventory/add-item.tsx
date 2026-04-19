@@ -6,45 +6,47 @@ import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import Header from "../../../components/ui/Header";
 
 import DatePicker from '../../../components/ui/DatePicker';
+import { useTranslation } from '../../../utils/i18n';
 
 export default function AddInventoryItemScreen() {
+  const { t } = useTranslation();
   const [purchaseDate, setPurchaseDate] = useState(new Date());
 
   return (
     <View style={styles.safe}>
-      <Header title="Add Inventory" showBack={true} />
+      <Header title={t('add_inventory_title')} showBack={true} />
       <KeyboardAvoidingView 
         style={{ flex: 1 }} 
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
 
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-          <Text style={styles.pageTitle}>Add Inventory Item</Text>
+          <Text style={styles.pageTitle}>{t('add_inventory_item')}</Text>
           <Text style={styles.pageSubtitle}>
-            Add a new ingredient or product to your inventory.
+            {t('add_inventory_item_subtitle')}
           </Text>
 
           {/* Form Fields */}
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Product Name</Text>
-            <TextInput style={styles.input} placeholder="e.g. Organic Tomatoes" placeholderTextColor="#9CA3AF" />
+            <Text style={styles.label}>{t('product_name')}</Text>
+            <TextInput style={styles.input} placeholder={t('product_name_placeholder')} placeholderTextColor="#9CA3AF" />
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Category</Text>
+            <Text style={styles.label}>{t('category')}</Text>
             <TouchableOpacity style={styles.dropdownInput}>
-              <Text style={styles.dropdownText}>Select Category</Text>
+              <Text style={styles.dropdownText}>{t('select_category')}</Text>
               <Feather name="chevron-down" size={moderateScale(18)} color="#111827" />
             </TouchableOpacity>
           </View>
 
           <View style={styles.row}>
             <View style={[styles.formGroup, { flex: 1 }]}>
-              <Text style={styles.label}>Stock Quantity</Text>
+              <Text style={styles.label}>{t('form_stock_quantity')}</Text>
               <TextInput style={styles.input} placeholder="0" keyboardType="numeric" placeholderTextColor="#9CA3AF" />
             </View>
             <View style={[styles.formGroup, { flex: 1 }]}>
-              <Text style={styles.label}>Unit Type</Text>
+              <Text style={styles.label}>{t('unit_type')}</Text>
               <TouchableOpacity style={styles.dropdownInput}>
                 <Text style={styles.dropdownTextFilled}>kg</Text>
                 <Feather name="chevron-down" size={moderateScale(18)} color="#111827" />
@@ -53,23 +55,23 @@ export default function AddInventoryItemScreen() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Supplier Name</Text>
-            <TextInput style={styles.input} placeholder="Enter supplier name" placeholderTextColor="#9CA3AF" />
+            <Text style={styles.label}>{t('supplier_name')}</Text>
+            <TextInput style={styles.input} placeholder={t('enter_supplier_name')} placeholderTextColor="#9CA3AF" />
           </View>
 
           <View style={styles.row}>
             <View style={[styles.formGroup, { flex: 1 }]}>
-              <Text style={styles.label}>Unit Price ($)</Text>
+              <Text style={styles.label}>{t('unit_price')}</Text>
               <TextInput style={styles.input} placeholder="0.00" keyboardType="decimal-pad" placeholderTextColor="#9CA3AF" />
             </View>
             <View style={[styles.formGroup, { flex: 1 }]}>
-              <Text style={styles.label}>Alert Threshold</Text>
-              <TextInput style={styles.input} placeholder="Low stock at..." keyboardType="numeric" placeholderTextColor="#9CA3AF" />
+              <Text style={styles.label}>{t('alert_threshold')}</Text>
+              <TextInput style={styles.input} placeholder={t('low_stock_at')} keyboardType="numeric" placeholderTextColor="#9CA3AF" />
             </View>
           </View>
 
           <DatePicker 
-            label="Purchase Date" 
+            label={t('purchase_date')} 
             value={purchaseDate} 
             onChange={setPurchaseDate} 
           />
@@ -82,7 +84,7 @@ export default function AddInventoryItemScreen() {
         <View style={styles.footer}>
           <TouchableOpacity style={styles.saveBtn} onPress={() => router.back()}>
             <Feather name="save" size={moderateScale(18)} color="#FFFFFF" />
-            <Text style={styles.saveBtnText}>Save Item</Text>
+            <Text style={styles.saveBtnText}>{t('save_item')}</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

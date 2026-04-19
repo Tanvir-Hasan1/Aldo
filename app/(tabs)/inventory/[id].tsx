@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import Header from "../../../components/ui/Header";
+import { useTranslation } from '../../../utils/i18n';
 
 import { HistoryList } from '../../../components/inventory/view-stock/HistoryList';
 import { StockUpdate } from '../../../components/inventory/view-stock/StockUpdate';
@@ -11,6 +12,7 @@ import { SupplierCard } from '../../../components/inventory/view-stock/SupplierC
 import { INVENTORY_ITEMS } from './index';
 
 export default function ItemDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const item = INVENTORY_ITEMS.find((i) => i.id === id) || INVENTORY_ITEMS[0];
 
@@ -26,7 +28,7 @@ export default function ItemDetailScreen() {
         {/* Current Stock Banner */}
         <View style={styles.stockBanner}>
           <View>
-            <Text style={styles.bannerLabel}>Current Stock</Text>
+            <Text style={styles.bannerLabel}>{t('current_stock')}</Text>
             <View style={styles.bannerValContainer}>
               <Text style={styles.bannerVal}>{item.currentStock}</Text>
               <Text style={styles.bannerUnit}>{item.unit}</Text>
@@ -46,11 +48,11 @@ export default function ItemDetailScreen() {
         <View style={styles.bottomActions}>
           <TouchableOpacity style={styles.secondaryBtn}>
             <Feather name="edit" size={moderateScale(16)} color="#6B7280" />
-            <Text style={styles.secondaryBtnText}>Edit Item</Text>
+            <Text style={styles.secondaryBtnText}>{t('edit_item')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.secondaryBtn, { borderColor: '#FEE2E2' }]}>
             <Feather name="trash-2" size={moderateScale(16)} color="#DC2626" />
-            <Text style={[styles.secondaryBtnText, { color: '#DC2626' }]}>Delete</Text>
+            <Text style={[styles.secondaryBtnText, { color: '#DC2626' }]}>{t('delete')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

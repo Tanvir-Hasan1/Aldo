@@ -2,19 +2,21 @@ import { Feather } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { useTranslation } from '../../../utils/i18n';
 
 export function StockUpdate() {
+  const { t } = useTranslation();
   const [stockToUpdate, setStockToUpdate] = useState({ add: 0, remove: 0 });
 
   return (
     <View>
-      <Text style={styles.sectionTitle}>Stock Update</Text>
+      <Text style={styles.sectionTitle}>{t('stock_update')}</Text>
       <View style={styles.updateRow}>
         <TouchableOpacity
           style={styles.updateBox}
           onPress={() => setStockToUpdate((prev) => ({ ...prev, add: prev.add + 1 }))}
         >
-          <Text style={styles.updateLabel}>ADD STOCK</Text>
+          <Text style={styles.updateLabel}>{t('add_stock')}</Text>
           <View style={styles.updateControls}>
             <Feather name="plus-circle" size={moderateScale(20)} color="#16A34A" />
             <Text style={styles.updateNum}>{stockToUpdate.add}</Text>
@@ -24,7 +26,7 @@ export function StockUpdate() {
           style={styles.updateBox}
           onPress={() => setStockToUpdate((prev) => ({ ...prev, remove: prev.remove + 1 }))}
         >
-          <Text style={styles.updateLabel}>REMOVE STOCK</Text>
+          <Text style={styles.updateLabel}>{t('remove_stock')}</Text>
           <View style={styles.updateControls}>
             <Feather name="minus-circle" size={moderateScale(20)} color="#DC2626" />
             <Text style={styles.updateNum}>{stockToUpdate.remove}</Text>
@@ -33,7 +35,7 @@ export function StockUpdate() {
       </View>
 
       <TouchableOpacity style={styles.updateButton}>
-        <Text style={styles.updateButtonText}>Update Stock Level</Text>
+        <Text style={styles.updateButtonText}>{t('update_stock_level')}</Text>
       </TouchableOpacity>
     </View>
   );

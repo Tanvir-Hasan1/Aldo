@@ -2,11 +2,13 @@ import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { useTranslation } from '../../../utils/i18n';
 
 export function SupplierCard({ item }: { item: any }) {
+  const { t } = useTranslation();
   return (
     <View>
-      <Text style={styles.sectionTitle}>Supplier Details</Text>
+      <Text style={styles.sectionTitle}>{t('supplier_details')}</Text>
       <View style={styles.supplierCard}>
         <View style={styles.supplierHeader}>
           <View style={styles.supplierIconBox}>
@@ -19,11 +21,11 @@ export function SupplierCard({ item }: { item: any }) {
         </View>
         <View style={styles.supplierMetaRow}>
           <View>
-            <Text style={styles.metaLabel}>LAST PURCHASE</Text>
+            <Text style={styles.metaLabel}>{t('last_purchase')}</Text>
             <Text style={styles.metaValue}>{item.lastPurchaseFull}</Text>
           </View>
           <View>
-            <Text style={styles.metaLabel}>PRICE PER UNIT</Text>
+            <Text style={styles.metaLabel}>{t('price_per_unit')}</Text>
             <Text style={styles.metaValue}>
               ${item.pricePerUnit.toFixed(2)} / {item.unit.replace(/s$/, '')}
             </Text>

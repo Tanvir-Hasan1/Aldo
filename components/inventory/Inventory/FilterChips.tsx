@@ -2,32 +2,34 @@ import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { useTranslation } from '../../../utils/i18n';
 
 export function FilterChips() {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         
         {/* Active Filter (All Items) */}
         <TouchableOpacity style={[styles.chip, styles.chipActive]}>
-          <Text style={styles.chipTextActive}>All Items</Text>
+          <Text style={styles.chipTextActive}>{t('all_items')}</Text>
         </TouchableOpacity>
 
         {/* Dropdown Filter (Supplier) */}
         <TouchableOpacity style={styles.chipDropdown}>
-          <Text style={styles.chipDropdownText}>Supplier</Text>
+          <Text style={styles.chipDropdownText}>{t('supplier')}</Text>
           <Feather name="chevron-down" size={moderateScale(14)} color="#4B5563" />
         </TouchableOpacity>
 
         {/* Dropdown Filter (Category) */}
         <TouchableOpacity style={styles.chipDropdown}>
-          <Text style={styles.chipDropdownText}>Category</Text>
+          <Text style={styles.chipDropdownText}>{t('category')}</Text>
           <Feather name="chevron-down" size={moderateScale(14)} color="#4B5563" />
         </TouchableOpacity>
 
         {/* Highlight Filter (Low Stock) */}
         <TouchableOpacity style={[styles.chip, styles.chipHighlight]}>
-          <Text style={styles.chipTextHighlight}>Low Stock</Text>
+          <Text style={styles.chipTextHighlight}>{t('low_stock')}</Text>
         </TouchableOpacity>
 
       </ScrollView>
