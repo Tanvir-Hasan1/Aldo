@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { useTranslation } from '../../../utils/i18n';
 
 interface DocumentInformationProps {
   supplierName: string;
@@ -23,13 +24,14 @@ export default function DocumentInformation({
   isEditing,
   onChange 
 }: DocumentInformationProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.card}>
-      <Text style={styles.sectionTitle}>Document Information</Text>
+      <Text style={styles.sectionTitle}>{t('document_information')}</Text>
       
       <View style={styles.gridRow}>
         <View style={styles.gridItem}>
-          <Text style={styles.label}>Supplier Name</Text>
+          <Text style={styles.label}>{t('supplier_name')}</Text>
           {isEditing ? (
             <TextInput
               style={styles.input}
@@ -41,7 +43,7 @@ export default function DocumentInformation({
           )}
         </View>
         <View style={styles.gridItem}>
-          <Text style={styles.label}>Invoice Number</Text>
+          <Text style={styles.label}>{t('invoice_number')}</Text>
           {isEditing ? (
             <TextInput
               style={styles.input}
@@ -56,7 +58,7 @@ export default function DocumentInformation({
       
       <View style={styles.gridRow}>
         <View style={styles.gridItem}>
-          <Text style={styles.label}>Total Amount</Text>
+          <Text style={styles.label}>{t('total_amount')}</Text>
           {isEditing ? (
             <TextInput
               style={styles.inputHighlight}
@@ -69,7 +71,7 @@ export default function DocumentInformation({
           )}
         </View>
         <View style={styles.gridItem}>
-          <Text style={styles.label}>Invoice Date</Text>
+          <Text style={styles.label}>{t('invoice_date')}</Text>
           {isEditing ? (
             <TextInput
               style={styles.input}
@@ -85,7 +87,7 @@ export default function DocumentInformation({
       
       <View style={styles.gridRow}>
         <View style={styles.gridItem}>
-          <Text style={styles.label}>VAT Amount</Text>
+          <Text style={styles.label}>{t('vat_amount')}</Text>
           {isEditing ? (
             <TextInput
               style={styles.input}
@@ -98,7 +100,7 @@ export default function DocumentInformation({
           )}
         </View>
         <View style={styles.gridItem}>
-          <Text style={styles.label}>Upload Date</Text>
+          <Text style={styles.label}>{t('upload_date')}</Text>
           <Text style={styles.valueLight}>{uploadDate}</Text>
         </View>
       </View>

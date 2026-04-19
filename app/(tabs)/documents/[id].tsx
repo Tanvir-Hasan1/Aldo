@@ -20,9 +20,11 @@ import DetailsActions from "../../../components/documents/document-details/Detai
 import DocumentInformation from "../../../components/documents/document-details/DocumentInformation";
 import DocumentPreview from "../../../components/documents/document-details/DocumentPreview";
 import ExtractedData from "../../../components/documents/document-details/ExtractedData";
+import { useTranslation } from "../../../utils/i18n";
 const { StorageAccessFramework } = FileSystem;
 
 export default function DocumentDetailsScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
@@ -160,10 +162,10 @@ export default function DocumentDetailsScreen() {
       setData(response.data);
       setTimestamp(Date.now());
       setIsEditing(false);
-      Alert.alert("Success", "Document updated successfully.");
+      Alert.alert(t('success'), t('document_updated'));
     } catch (error) {
       console.error("Error updating document:", error);
-      Alert.alert("Error", "Failed to update document.");
+      Alert.alert(t('error'), t('document_update_failed'));
     } finally {
       setLoading(false);
     }
@@ -171,12 +173,12 @@ export default function DocumentDetailsScreen() {
 
   const handleDelete = () => {
     Alert.alert(
-      "Delete Document",
-      "Are you sure you want to delete this document? This action cannot be undone.",
+      t('delete_document_title'),
+      t('delete_document_msg'),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t('cancel'), style: "cancel" },
         {
-          text: "Delete",
+          text: t('delete'),
           style: "destructive",
           onPress: async () => {
             try {
@@ -186,8 +188,8 @@ export default function DocumentDetailsScreen() {
             } catch (error) {
               console.error("Error deleting document:", error);
               Alert.alert(
-                "Error",
-                "Failed to delete document. Please try again.",
+                t('error'),
+                t('document_delete_failed'),
               );
               setLoading(false);
             }
@@ -230,7 +232,7 @@ export default function DocumentDetailsScreen() {
             await FileSystem.writeAsStringAsync(fileUri, base64, {
               encoding: FileSystem.EncodingType.Base64,
             });
-            alert("Downloaded successfully to your selected folder.");
+            alert(t('download_success'));
           };
           reader.readAsDataURL(blob);
         }
@@ -247,7 +249,7 @@ export default function DocumentDetailsScreen() {
       }
     } catch (error) {
       console.error("Download Error:", error);
-      alert("Failed to download file.");
+      alert(t('download_failed'));
     } finally {
       setDownloading(false);
     }
@@ -303,7 +305,7 @@ export default function DocumentDetailsScreen() {
 
   return (
     <View style={styles.safeArea}>
-      <Header title="Document Details" showBack={true} />
+      <Header title={t('document_details_title')} showBack={true} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}

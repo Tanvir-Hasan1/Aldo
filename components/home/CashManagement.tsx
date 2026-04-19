@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { CreditCardIcon, BanknotesIcon, BuildingLibraryIcon, ChevronRightIcon } from 'react-native-heroicons/outline';
+import { useTranslation } from '../../utils/i18n';
 
 interface CashItemProps {
   title: string;
@@ -35,6 +36,7 @@ interface CashManagementProps {
 }
 
 export default function CashManagement({ cashData }: CashManagementProps) {
+  const { t } = useTranslation();
   const getIconData = (label: string) => {
     switch (label.toLowerCase()) {
       case 'total cash collected': return CreditCardIcon;
@@ -58,7 +60,7 @@ export default function CashManagement({ cashData }: CashManagementProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Cash Management</Text>
+      <Text style={styles.sectionTitle}>{t('cash_management')}</Text>
       
       <View style={styles.cardContainer}>
         {parsedCashData.map((item, index) => (

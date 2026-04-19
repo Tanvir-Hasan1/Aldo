@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { useTranslation } from '../../utils/i18n';
 
 interface RevenueTrendChartProps {
   weeklyRevenue: Array<{ label: string; value: number }>;
@@ -10,16 +11,17 @@ interface RevenueTrendChartProps {
 
 export default function RevenueTrendChart({ weeklyRevenue, totalRevenue, changePercent }: RevenueTrendChartProps) {
   const maxValue = Math.max(...weeklyRevenue.map(item => item.value), 1);
+  const { t } = useTranslation();
   
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Revenue Trend</Text>
+          <Text style={styles.title}>{t('revenue_trend')}</Text>
           <Text style={styles.value}>${totalRevenue.toLocaleString()}</Text>
         </View>
         <Text style={[styles.trend, { color: changePercent >= 0 ? '#10B981' : '#EF4444' }]}>
-          {changePercent >= 0 ? '+' : ''}{changePercent}% <Text style={styles.trendSub}>Last Week</Text>
+          {changePercent >= 0 ? '+' : ''}{changePercent}% <Text style={styles.trendSub}>{t('last_week')}</Text>
         </Text>
       </View>
 

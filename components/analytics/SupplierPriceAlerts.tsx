@@ -2,20 +2,22 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from '../../utils/i18n';
 
 interface SupplierPriceAlertsProps {
   alerts: any[];
 }
 
 export default function SupplierPriceAlerts({ alerts }: SupplierPriceAlertsProps) {
+  const { t } = useTranslation();
   if (!alerts || alerts.length === 0) {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>Supplier Price Alerts</Text>
+          <Text style={styles.title}>{t('supplier_price_alerts')}</Text>
         </View>
         <View style={[styles.alertCard, { backgroundColor: '#F3F4F6', justifyContent: 'center' }]}>
-          <Text style={[styles.alertTitle, { color: '#6B7280', textAlign: 'center' }]}>No price alerts at this time</Text>
+          <Text style={[styles.alertTitle, { color: '#6B7280', textAlign: 'center' }]}>{t('no_price_alerts')}</Text>
         </View>
       </View>
     );
@@ -24,9 +26,9 @@ export default function SupplierPriceAlerts({ alerts }: SupplierPriceAlertsProps
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Supplier Price Alerts</Text>
+        <Text style={styles.title}>{t('supplier_price_alerts')}</Text>
         <TouchableOpacity>
-          <Text style={styles.viewAll}>VIEW ALL</Text>
+          <Text style={styles.viewAll}>{t('see_all').toUpperCase()}</Text>
         </TouchableOpacity>
       </View>
 
@@ -36,8 +38,8 @@ export default function SupplierPriceAlerts({ alerts }: SupplierPriceAlertsProps
             <Feather name="trending-up" size={moderateScale(18)} color="#EF4444" />
           </View>
           <View style={styles.textContainer}>
-            <Text style={styles.alertTitle}>{alert.title || 'Price Alert'}</Text>
-            <Text style={styles.impact}>Impact: <Text style={styles.impactValue}>{alert.impact || 'Calculating...'}</Text></Text>
+            <Text style={styles.alertTitle}>{alert.title || t('price_alert')}</Text>
+            <Text style={styles.impact}>{t('impact')} <Text style={styles.impactValue}>{alert.impact || t('calculating')}</Text></Text>
           </View>
         </View>
       ))}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { useTranslation } from '../../../utils/i18n';
 
 interface ExtractedItem {
   id: string;
@@ -17,9 +18,10 @@ interface ExtractedDataProps {
 }
 
 export default function ExtractedData({ items, isEditing, onItemChange }: ExtractedDataProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Extracted Data</Text>
+      <Text style={styles.sectionTitle}>{t('extracted_data')}</Text>
       
       <View style={styles.card}>
         {items.map((item, index) => {
@@ -33,10 +35,10 @@ export default function ExtractedData({ items, isEditing, onItemChange }: Extrac
                       style={styles.inputName}
                       value={item.name}
                       onChangeText={(text) => onItemChange?.(index, 'product_name', text)}
-                      placeholder="Product Name"
+                      placeholder={t('product_name')}
                     />
                     <View style={styles.editMetaRow}>
-                      <Text style={styles.itemMeta}>Qty: </Text>
+                      <Text style={styles.itemMeta}>{t('qty')}: </Text>
                       <TextInput
                         style={styles.inputSmall}
                         value={String(item.qty)}
@@ -55,7 +57,7 @@ export default function ExtractedData({ items, isEditing, onItemChange }: Extrac
                 ) : (
                   <>
                     <Text style={styles.itemName}>{item.name}</Text>
-                    <Text style={styles.itemMeta}>Qty: {item.qty} × {item.unitPrice}</Text>
+                    <Text style={styles.itemMeta}>{t('qty')}: {item.qty} × {item.unitPrice}</Text>
                   </>
                 )}
               </View>

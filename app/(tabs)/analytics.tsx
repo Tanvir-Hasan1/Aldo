@@ -16,9 +16,10 @@ import { useAppStore } from '../../store/useAppStore';
 
 import ActionFilterBar from '../../components/home/ActionFilterBar';
 import apiClient from '../../api/apiClient';
-import { generateAnalyticsPdfExport, generateAnalyticsExcelExport } from '../../utils/exportData';
+import { useTranslation } from '../../utils/i18n';
 
 export default function AnalyticsScreen() {
+  const { t } = useTranslation();
   const analyticsData = useAppStore((state) => state.analyticsData);
   const setAnalyticsData = useAppStore((state) => state.setAnalyticsData);
   
@@ -67,7 +68,7 @@ export default function AnalyticsScreen() {
 
   return (
     <View style={styles.safeArea}>
-      <Header title="Analytics" showBell={true} />
+      <Header title={t('analytics_title')} showBell={true} />
 
       <ScrollView 
         showsVerticalScrollIndicator={false}
@@ -78,6 +79,7 @@ export default function AnalyticsScreen() {
           availablePeriods={['weekly', 'monthly']}
           onPeriodChange={handlePeriodChange}
           onExport={handleExport}
+          dropdownTop={verticalScale(130)}
         />
 
         <AnalyticsAIInsightCard insight={businessInsight || analyticsData.insight_banner} />

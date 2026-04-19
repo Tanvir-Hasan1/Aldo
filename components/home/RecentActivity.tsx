@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { DocumentArrowUpIcon, ClipboardDocumentListIcon, BoltIcon } from 'react-native-heroicons/outline';
+import { useTranslation } from '../../utils/i18n';
 
 interface ActivityItemProps {
   title: string;
@@ -34,6 +35,7 @@ interface RecentActivityProps {
 }
 
 export default function RecentActivity({ activities: apiActivities }: RecentActivityProps) {
+  const { t } = useTranslation();
   const getIconForType = (type?: string) => {
     switch (type?.toLowerCase()) {
       case 'invoice': return { IconComponent: DocumentArrowUpIcon, iconBgColor: '#FFF0E5', iconColor: '#FA8C4C' };
@@ -43,13 +45,13 @@ export default function RecentActivity({ activities: apiActivities }: RecentActi
   };
 
   const formatTimestamp = (timestamp: string) => {
-    if (!timestamp) return 'JUST NOW';
+    if (!timestamp) return t('just_now');
     const date = new Date(timestamp);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
     
-    if (diffHrs < 1) return 'JUST NOW';
+    if (diffHrs < 1) return t('just_now');
     if (diffHrs < 24) return `${diffHrs}H AGO`;
     return `${Math.floor(diffHrs / 24)}D AGO`;
   };
@@ -72,8 +74,8 @@ export default function RecentActivity({ activities: apiActivities }: RecentActi
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.sectionTitle}>Recent Activity</Text>
-        <Text style={styles.seeAllText}>See All</Text>
+        <Text style={styles.sectionTitle}>{t('recent_activity')}</Text>
+        <Text style={styles.seeAllText}>{t('see_all')}</Text>
       </View>
       
       <View style={styles.cardContainer}>
@@ -85,7 +87,7 @@ export default function RecentActivity({ activities: apiActivities }: RecentActi
             </View>
           ))
         ) : (
-          <Text style={styles.emptyText}>No recent activity</Text>
+          <Text style={styles.emptyText}>{t('no_recent_activity')}</Text>
         )}
       </View>
     </View>

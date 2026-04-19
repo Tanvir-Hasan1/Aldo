@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { useTranslation } from '../../utils/i18n';
 
 interface RevenueComparisonChartProps {
   comparison: Array<{ label: string; value: number }>;
@@ -8,10 +9,11 @@ interface RevenueComparisonChartProps {
 
 export default function RevenueComparisonChart({ comparison }: RevenueComparisonChartProps) {
   const maxValue = Math.max(...comparison.map(item => item.value), 1);
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Revenue Comparison</Text>
+      <Text style={styles.title}>{t('revenue_comparison')}</Text>
       
       {comparison.map((item, index) => {
         const widthPercent = (item.value / maxValue) * 100;

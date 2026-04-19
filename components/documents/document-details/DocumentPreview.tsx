@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { useTranslation } from '../../../utils/i18n';
 
 interface DocumentPreviewProps {
   status: string;
@@ -10,10 +11,11 @@ interface DocumentPreviewProps {
 }
 
 export default function DocumentPreview({ status, imageUrl, token }: DocumentPreviewProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Document Preview</Text>
+        <Text style={styles.title}>{t('document_preview')}</Text>
         <View style={styles.statusBadge}>
           <View style={styles.statusDot} />
           <Text style={styles.statusText}>{status}</Text>
@@ -34,7 +36,7 @@ export default function DocumentPreview({ status, imageUrl, token }: DocumentPre
           />
         ) : (
           <View style={styles.mockupDocument}>
-            <Text style={styles.mockupText}>INVOICE</Text>
+            <Text style={styles.mockupText}>{t('invoice')}</Text>
             <View style={styles.mockupLine} />
             <View style={styles.mockupLine} />
             <View style={[styles.mockupLine, { width: '60%' }]} />

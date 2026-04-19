@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from '../../utils/i18n';
 
 interface ActivityCostData {
   label: string;
@@ -14,11 +15,12 @@ interface ActivityCostSectionProps {
 }
 
 export default function ActivityCostSection({ coversActivity, costBreakdown }: ActivityCostSectionProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       {/* Covers Activity */}
       <View style={styles.card}>
-        <Text style={styles.title}>Covers Activity</Text>
+        <Text style={styles.title}>{t('covers_activity')}</Text>
         {coversActivity.map((item, index) => (
           <View key={index} style={styles.row}>
             <View style={styles.subRow}>
@@ -36,7 +38,7 @@ export default function ActivityCostSection({ coversActivity, costBreakdown }: A
 
       {/* Cost % */}
       <View style={styles.card}>
-        <Text style={styles.title}>Cost %</Text>
+        <Text style={styles.title}>{t('cost_percentage')}</Text>
         {costBreakdown.map((item, index) => (
           <View key={index} style={styles.row}>
             <Text style={styles.label}>{item.label}</Text>

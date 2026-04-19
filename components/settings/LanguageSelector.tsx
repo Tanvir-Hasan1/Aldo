@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
     borderRadius: scale(8),
   },
   selectedOption: {
-    backgroundColor: '#FFE4E1', // or #FFF7ED
     backgroundColor: '#FFEDD5',
   },
   flag: {

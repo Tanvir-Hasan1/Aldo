@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { CpuChipIcon, ArrowRightIcon } from 'react-native-heroicons/outline';
-
 import { useRouter } from 'expo-router';
+import { useTranslation } from '../../utils/i18n';
 
 interface AIInsightProps {
   insight?: {
@@ -14,23 +14,24 @@ interface AIInsightProps {
 
 export default function AIInsightBox({ insight }: AIInsightProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <CpuChipIcon size={moderateScale(14)} color="#FA8C4C" style={styles.icon} />
-        <Text style={styles.headerText}>{insight?.title?.toUpperCase() || "RISTO AI INSIGHT"}</Text>
+        <Text style={styles.headerText}>{insight?.title?.toUpperCase() || t('risto_ai_insight')}</Text>
       </View>
       
       <Text style={styles.insightText}>
-        {insight?.summary || "Food cost increased by 12% this week compared to the previous period."}
+        {insight?.summary || t('insight_fallback_text')}
       </Text>
       
       <TouchableOpacity 
         style={styles.actionButton}
         onPress={() => router.push("/(tabs)/home/view-insight")}
       >
-        <Text style={styles.actionText}>View Insight</Text>
+        <Text style={styles.actionText}>{t('view_insight')}</Text>
         <ArrowRightIcon size={moderateScale(14)} color="#FFFFFF" style={styles.arrow} />
       </TouchableOpacity>
     </View>

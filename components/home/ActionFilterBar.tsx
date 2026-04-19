@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { ArrowDownTrayIcon, ChevronDownIcon } from "react-native-heroicons/outline";
+import {
+  ArrowDownTrayIcon,
+  ChevronDownIcon,
+} from "react-native-heroicons/outline";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { useTranslation } from "../../utils/i18n";
 
@@ -9,6 +12,7 @@ interface ActionFilterBarProps {
   availablePeriods: string[];
   onPeriodChange: (period: string) => void;
   onExport?: (format: "pdf" | "excel") => void;
+  dropdownTop?: number;
 }
 
 export default function ActionFilterBar({
@@ -16,6 +20,7 @@ export default function ActionFilterBar({
   availablePeriods,
   onPeriodChange,
   onExport,
+  dropdownTop = verticalScale(165),
 }: ActionFilterBarProps) {
   const { t } = useTranslation();
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
@@ -32,7 +37,7 @@ export default function ActionFilterBar({
           onPress={() => setIsExportMenuOpen(true)}
         >
           <ArrowDownTrayIcon size={moderateScale(14)} color="#111827" />
-          <Text style={styles.actionText}>{t('export_data')}</Text>
+          <Text style={styles.actionText}>{t("export_data")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -54,9 +59,12 @@ export default function ActionFilterBar({
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
-          onPress={() => setIsExportMenuOpen(false)}
+          onPressOut={() => setIsExportMenuOpen(false)}
         >
-          <View style={[styles.dropdownMenu, { right: scale(100) }]}>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={[styles.dropdownMenu, { right: scale(100), top: dropdownTop }]}
+          >
             <TouchableOpacity
               style={styles.exportOptionBtn}
               onPress={() => {
@@ -76,7 +84,7 @@ export default function ActionFilterBar({
             >
               <Text style={styles.exportOptionText}>Excel</Text>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
 
@@ -90,9 +98,12 @@ export default function ActionFilterBar({
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
-          onPress={() => setIsPeriodMenuOpen(false)}
+          onPressOut={() => setIsPeriodMenuOpen(false)}
         >
-          <View style={[styles.dropdownMenu, { right: scale(20) }]}>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={[styles.dropdownMenu, { right: scale(20), top: dropdownTop }]}
+          >
             {availablePeriods.map((period) => (
               <TouchableOpacity
                 key={period}
@@ -104,7 +115,7 @@ export default function ActionFilterBar({
                   },
                 ]}
                 onPress={() => {
-                  onPeriodChange(period);
+                  onPeriodChange(period.toLowerCase());
                   setIsPeriodMenuOpen(false);
                 }}
               >
@@ -118,7 +129,7 @@ export default function ActionFilterBar({
                 </Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
     </View>
@@ -175,8 +186,7 @@ const styles = StyleSheet.create({
   },
   dropdownMenu: {
     position: "absolute",
-    top: verticalScale(125), // Measured roughly below the export button considering safe area
-    right: scale(100), // Positioned under the Export button
+    // top is dynamically injected
     backgroundColor: "#E5E7EB", // Light grey container
     borderRadius: scale(8),
     padding: scale(6),

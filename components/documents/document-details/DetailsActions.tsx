@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from '../../../utils/i18n';
 
 interface DetailsActionsProps {
   onDownload?: () => void;
@@ -20,6 +21,7 @@ export default function DetailsActions({
   onCancel, 
   onUpdate 
 }: DetailsActionsProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <View style={styles.topActions}>
@@ -33,7 +35,7 @@ export default function DetailsActions({
             color="#4B5563" 
             style={{ marginRight: scale(8) }}
           />
-          <Text style={styles.editButtonText}>{isEditing ? "Cancel" : "Edit Data"}</Text>
+          <Text style={styles.editButtonText}>{isEditing ? t('cancel') : t('edit_data')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
@@ -46,14 +48,14 @@ export default function DetailsActions({
             color="#FFFFFF" 
             style={{ marginRight: scale(8) }}
           />
-          <Text style={styles.downloadText}>{isEditing ? "Update" : "Download"}</Text>
+          <Text style={styles.downloadText}>{isEditing ? t('update_data') : t('download')}</Text>
         </TouchableOpacity>
       </View>
 
       {!isEditing && (
         <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
           <Feather name="trash-2" size={moderateScale(16)} color="#EF4444" style={{ marginRight: scale(8) }}/>
-          <Text style={styles.deleteText}>Delete Document</Text>
+          <Text style={styles.deleteText}>{t('delete_document_title')}</Text>
         </TouchableOpacity>
       )}
     </View>

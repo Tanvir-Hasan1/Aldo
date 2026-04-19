@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { useTranslation } from '../../utils/i18n';
 
 interface ChartDataPoint {
   day: string;
@@ -17,6 +18,7 @@ interface RevenueChartProps {
 }
 
 export default function RevenueChart({ revenue, period = 'weekly' }: RevenueChartProps) {
+  const { t } = useTranslation();
   // Mock data to match the screenshot roughly
   const fallbackData: ChartDataPoint[] = [
     { day: 'MON', totalHeight: 35, filledHeight: 25 },
@@ -42,8 +44,8 @@ export default function RevenueChart({ revenue, period = 'weekly' }: RevenueChar
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{isWeekly ? 'Weekly' : 'Monthly'} Revenue Trend</Text>
-        <Text style={styles.subtext}>{isWeekly ? 'Last 7 Days' : 'Current Month'}</Text>
+        <Text style={styles.title}>{isWeekly ? t('weekly_revenue_trend') : t('monthly_revenue_trend')}</Text>
+        <Text style={styles.subtext}>{isWeekly ? t('last_7_days') : t('current_month')}</Text>
       </View>
 
       <View style={styles.chartContainer}>

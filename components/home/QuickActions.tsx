@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { useRouter } from 'expo-router';
 import { DocumentArrowUpIcon, PencilSquareIcon, ClipboardDocumentListIcon, CurrencyDollarIcon } from 'react-native-heroicons/outline';
+import { useTranslation } from '../../utils/i18n';
 
 interface ActionItemProps {
   title: string;
@@ -30,6 +31,7 @@ interface QuickActionsProps {
 
 export default function QuickActions({ items: apiItems }: QuickActionsProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   
   const getActionData = (key: string) => {
     switch (key) {
@@ -47,10 +49,10 @@ export default function QuickActions({ items: apiItems }: QuickActionsProps) {
   };
 
   const fallbackActions = [
-    { key: 'upload_invoice', label: 'Upload Invoice' },
-    { key: 'daily_data', label: 'Add Daily Data' },
-    { key: 'expenses', label: 'Expenses' },
-    { key: 'cash', label: 'Cash' },
+    { key: 'upload_invoice', label: t('upload_invoice') },
+    { key: 'daily_data', label: t('add_daily_data') },
+    { key: 'expenses', label: t('expenses') },
+    { key: 'cash', label: t('cash') },
   ];
 
   const displayActions = (apiItems && apiItems.length > 0 ? apiItems : fallbackActions).map(item => {
@@ -64,7 +66,7 @@ export default function QuickActions({ items: apiItems }: QuickActionsProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Quick Actions</Text>
+      <Text style={styles.sectionTitle}>{t('quick_actions')}</Text>
       
       <View style={styles.cardContainer}>
         {displayActions.map((item: any) => (
