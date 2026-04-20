@@ -1,23 +1,84 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import PhotoPickerModal from '../../ui/PhotoPickerModal';
 
-export default function ProfileImageEdit() {
+interface ProfileImageEditProps {
+  profileImageUrl?: string | null;
+  onImageChange?: (uri: string) => void;
+}
+
+export default function ProfileImageEdit({ profileImageUrl, onImageChange }: ProfileImageEditProps) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [localImageUri, setLocalImageUri] = useState<string | null>(profileImageUrl || null);
+
+  React.useEffect(() => {
+    if (profileImageUrl && !localImageUri) {
+      setLocalImageUri(profileImageUrl);
+    }
+  }, [profileImageUrl]);
+
+  const handleCamera = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("You need to allow camera access to take a photo!");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setLocalImageUri(result.assets[0].uri);
+    }
+  };
+
+  const handleGallery = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("You need to allow gallery access to choose a photo!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setLocalImageUri(result.assets[0].uri);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.imageWrapper}>
         <Image 
-          source={{ uri: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200' }} 
-          style={styles.avatar} 
+          source={{ uri: localImageUri || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200' }} 
+          style={styles.avatar}  
         />
-        <TouchableOpacity style={styles.cameraButton}>
+        <TouchableOpacity style={styles.cameraButton} onPress={() => setModalVisible(true)}>
           <Feather name="camera" size={moderateScale(14)} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
         <Text style={styles.changeText}>Change Photo</Text>
       </TouchableOpacity>
+
+      <PhotoPickerModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSelectCamera={handleCamera}
+        onSelectGallery={handleGallery}
+      />
     </View>
   );
 }

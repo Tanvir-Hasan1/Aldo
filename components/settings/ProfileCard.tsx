@@ -1,23 +1,26 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { useAppStore } from '../../store/useAppStore';
 
 interface ProfileCardProps {
   onEditProfile: () => void;
 }
 
 export default function ProfileCard({ onEditProfile }: ProfileCardProps) {
+  const profile = useAppStore((state) => state.profile);
+
   return (
     <View style={styles.container}>
       <View style={styles.infoRow}>
         <Image 
-          source={{ uri: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200' }} 
+          source={{ uri: profile?.profile_image_url || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200' }} 
           style={styles.avatar} 
         />
         <View style={styles.textContainer}>
-          <Text style={styles.name}>Alex Chef</Text>
-          <Text style={styles.email}>alex@ristoai.com</Text>
-          <Text style={styles.location}>The Grand Bistro • New York, NY</Text>
+          <Text style={styles.name}>{profile?.full_name || 'Loading...'}</Text>
+          <Text style={styles.email}>{profile?.email || '-----'}</Text>
+          <Text style={styles.location}>{profile?.restaurant_name || '-----'} • {profile?.city_location || '-----'}</Text>
         </View>
       </View>
       

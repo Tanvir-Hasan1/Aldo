@@ -1,6 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect } from 'react';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 // Components
@@ -10,11 +11,25 @@ import SettingsList from '../../../components/settings/SettingsList';
 import Header from '../../../components/ui/Header';
 import { useAppStore } from '../../../store/useAppStore';
 import { useTranslation } from '../../../utils/i18n';
+import apiClient from '../../../api/apiClient';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const logout = useAppStore((state) => state.logout);
+  const setProfile = useAppStore((state) => state.setProfile);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await apiClient.get('/api/v1/restaurant/settings/profile');
+        setProfile(response.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+    fetchProfile();
+  }, [setProfile]);
 
   return (
     <View style={styles.safeArea}>

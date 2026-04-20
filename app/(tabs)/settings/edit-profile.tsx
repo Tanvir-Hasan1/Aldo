@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingV
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useAppStore } from '../../../store/useAppStore';
 
 // Components
 import Header from '../../../components/ui/Header';
@@ -11,6 +12,7 @@ import RestaurantDetailsForm from '../../../components/settings/edit-profile/Res
 
 export default function EditProfileScreen() {
   const router = useRouter();
+  const profile = useAppStore((state) => state.profile);
 
   return (
     <View style={styles.safeArea}>
@@ -21,17 +23,22 @@ export default function EditProfileScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-          <ProfileImageEdit />
+          <ProfileImageEdit profileImageUrl={profile?.profile_image_url || null} />
 
           <View style={styles.formSection}>
-            <FormInput label="User Name" defaultValue="Alexander Chen" />
-            <FormInput label="Email Address" defaultValue="alexander.chen@bistroguru.com" keyboardType="email-address" />
-            <FormInput label="Phone Number" defaultValue="+1 (555) 123-4567" keyboardType="phone-pad" />
+            <FormInput label="User Name" defaultValue={profile?.full_name || ''} />
+            <FormInput label="Email Address" defaultValue={profile?.email || ''} keyboardType="email-address" />
+            <FormInput label="Phone Number" defaultValue={profile?.phone || ''} keyboardType="phone-pad" />
           </View>
 
           <View style={styles.separator} />
 
-          <RestaurantDetailsForm />
+          <RestaurantDetailsForm 
+            restaurantName={profile?.restaurant_name || ''}
+            restaurantType={profile?.restaurant_type || ''}
+            cityLocation={profile?.city_location || ''}
+            numberOfSeats={profile?.number_of_seats?.toString() || ''}
+          />
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>

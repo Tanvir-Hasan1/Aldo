@@ -11,6 +11,19 @@ export interface User {
   [key: string]: any; // Allow other fields from the API
 }
 
+export interface Profile {
+  full_name: string;
+  email: string;
+  phone: string | null;
+  restaurant_name: string;
+  restaurant_type: string | null;
+  location: string | null;
+  city_location: string | null;
+  number_of_seats: string | number | null;
+  preferred_language: string;
+  profile_image_url: string | null;
+}
+
 export interface Tokens {
   access_token: string;
   refresh_token: string;
@@ -77,11 +90,13 @@ interface AppState {
   analyticsData: AnalyticsData | null;
   cashOverviewData: CashOverviewData | null;
   vatOverviewData: VatOverviewData | null;
+  profile: Profile | null;
   setUser: (user: User | null, tokens?: Tokens | null) => void;
   setTokens: (tokens: Tokens | null) => void;
   setAnalyticsData: (data: AnalyticsData | null) => void;
   setCashOverviewData: (data: CashOverviewData | null) => void;
   setVatOverviewData: (data: VatOverviewData | null) => void;
+  setProfile: (profile: Profile | null) => void;
   appLanguage: 'en' | 'it';
   setAppLanguage: (lang: 'en' | 'it') => void;
   logout: () => void;
@@ -98,11 +113,13 @@ export const useAppStore = create<AppState>()(
       analyticsData: null,
       cashOverviewData: null,
       vatOverviewData: null,
+      profile: null,
       setUser: (user, tokens = null) => set({ user, tokens }),
       setTokens: (tokens: Tokens | null) => set({ tokens }),
       setAnalyticsData: (data) => set({ analyticsData: data }),
       setCashOverviewData: (data) => set({ cashOverviewData: data }),
       setVatOverviewData: (data) => set({ vatOverviewData: data }),
+      setProfile: (profile) => set({ profile }),
       appLanguage: 'en',
       setAppLanguage: (lang) => set({ appLanguage: lang }),
       logout: () =>
@@ -112,6 +129,7 @@ export const useAppStore = create<AppState>()(
           analyticsData: null,
           cashOverviewData: null,
           vatOverviewData: null,
+          profile: null,
         }),
     }),
     {

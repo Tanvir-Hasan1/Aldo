@@ -1,30 +1,60 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
-import { Feather } from '@expo/vector-icons';
 import FormInput from './FormInput';
 
-export default function RestaurantDetailsForm() {
+interface RestaurantDetailsFormProps {
+  restaurantName?: string;
+  restaurantType?: string;
+  cityLocation?: string;
+  numberOfSeats?: string;
+  onChangeRestaurantName?: (val: string) => void;
+  onChangeRestaurantType?: (val: string) => void;
+  onChangeCityLocation?: (val: string) => void;
+  onChangeNumberOfSeats?: (val: string) => void;
+}
+
+export default function RestaurantDetailsForm({
+  restaurantName,
+  restaurantType,
+  cityLocation,
+  numberOfSeats,
+  onChangeRestaurantName,
+  onChangeRestaurantType,
+  onChangeCityLocation,
+  onChangeNumberOfSeats,
+}: RestaurantDetailsFormProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>RESTAURANT DETAILS</Text>
       
-      <FormInput label="Restaurant Name" defaultValue="The Golden Harvest" />
+      <FormInput 
+        label="Restaurant Name" 
+        defaultValue={restaurantName} 
+        onChangeText={onChangeRestaurantName}
+      />
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Restaurant Type</Text>
-        <TouchableOpacity style={styles.dropdown} activeOpacity={0.7}>
-          <Text style={styles.dropdownText}>Fine Dining</Text>
-          <Feather name="chevron-down" size={moderateScale(18)} color="#9CA3AF" />
-        </TouchableOpacity>
-      </View>
+      <FormInput 
+        label="Restaurant Type" 
+        defaultValue={restaurantType} 
+        onChangeText={onChangeRestaurantType}
+      />
 
       <View style={styles.row}>
         <View style={{ flex: 1, marginRight: scale(8) }}>
-          <FormInput label="City / Location" defaultValue="San Francisco" />
+          <FormInput 
+            label="City / Location" 
+            defaultValue={cityLocation} 
+            onChangeText={onChangeCityLocation}
+          />
         </View>
         <View style={{ flex: 1, marginLeft: scale(8) }}>
-          <FormInput label="Number of Seats" defaultValue="120" keyboardType="numeric" />
+          <FormInput 
+            label="Number of Seats" 
+            defaultValue={numberOfSeats} 
+            keyboardType="numeric" 
+            onChangeText={onChangeNumberOfSeats}
+          />
         </View>
       </View>
     </View>
@@ -41,31 +71,6 @@ const styles = StyleSheet.create({
     color: '#FA8C4C',
     letterSpacing: 1,
     marginBottom: verticalScale(20),
-  },
-  inputGroup: {
-    marginBottom: verticalScale(16),
-  },
-  label: {
-    fontSize: moderateScale(14, 0.3),
-    fontWeight: '700',
-    color: '#374151',
-    marginBottom: verticalScale(8),
-  },
-  dropdown: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: scale(12),
-    height: verticalScale(50),
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: scale(16),
-  },
-  dropdownText: {
-    fontSize: moderateScale(15, 0.3),
-    color: '#111827',
-    fontWeight: '500',
   },
   row: {
     flexDirection: 'row',
